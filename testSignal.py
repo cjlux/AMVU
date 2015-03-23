@@ -23,7 +23,7 @@ from __future__ import division
 """
 
 # Version 0.1
-# Last update : 23/03/2015 16:31
+# Last update : 23/03/2015 22:13
 
 import pyaudio
 import numpy
@@ -34,20 +34,52 @@ from PyQt4 import Qwt5 as Qwt
 
 
 class Signal():
-    """ Signal provided by souncard """
+    """ Signal provided by the soundcard """
 
     def __init__(self, rate, size) :
-        """ Open a stream from the sound card and start it"""
+        """ Open a stream from the sound card """
+        self.rate = rate
+        self.size = size
+        
         pyAudio = pyaudio.PyAudio()
         self.stream  = pyAudio.open( format            = pyaudio.paInt16, 
                                      channels          = 2,
                                      input             = True,
                                      rate              = rate,
                                      frames_per_buffer = size)
-        self.stream.start_stream()
         
     def getStream(self):
+        """ Return the stream used for the current signal """
         return self.stream
+    
+    def startSignalStream(self):
+        """ Start the stream used for the current signal """
+        self.stream.start_stream()
+    
+    def stopSignalStream(self):
+        """ Stop the stream used for the current signal """
+        self.stream.stop_stream()
+        
+    def closeSignalStream(self):
+        """ Close the stream used for the current signal """
+        self.stream.close_signal()
+
+    def getSignalInfo(self):
+        """ Give some information about the signal """
+        return "Rate : "+str(self.rate)+" | Size : "+str(self.size)
+    
+    def getSignalForScope(self):
+        """ return an array containing formated signal for scope display """
+        X = self.readSignal(self.size)
+        cal = 1./65536.0
+        P = numpy.array(X, dtype='d')*cal  # 'd' -> double
+        R, L = P[0::2], P[1::2]
+        lenR = len(R)
+
+        L -= L.mean()
+        R -= R.mean()
+        return [L,R]
+    
         
     def displayContinuousSignal(self):
         """ Display a part of the stream every seconds"""
@@ -64,6 +96,10 @@ class Signal():
         #self.displayContinuousSignal()
         #t1 = Timer(1.0, self.displayContinuousSignal)
         #t1.start()
+    
+    def readStream(self, n):
+        """ Read n value from the stream of the current signal"""
+        return self.stream.read(n)
 
     def readSignal(self,n) :
         """ Read some data from this signal """
@@ -72,30 +108,18 @@ class Signal():
     
     def displayStream(self):
         """ Read and display all the stream """
+        print "[displayStream] Acquisition du signal"
         self.audioStream2 = self.readSignal(2048)
+        print "[displayStream] Lecture du signal"
         time.sleep(0.5)
+        print "[displayStream] Affichage du signal"
         self.printStream()
         
     def printStream(self):
         """ Print the stream in the command line """
         print "[printStream] Plot stream "
         print str(self.audioStream2)
-        
-    def printBufferTotal(self):
-        print "[printBufferTotal] Print expended buffer"
-        print str(self.bufferTotal)
     
-    
-    def stopSignal(self):
-        """ Close the stream providing the signal """
-        self.stream.stop_stream()
-        self.stream.close()
-        #pyaudio.terminate()
-    
-    def printSignal(self):
-        """ Print the buffer in the command line """
-        print "[printSignal] Plot signal "
-        print str(self.audioStream)
 
 
 

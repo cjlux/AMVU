@@ -23,7 +23,7 @@ from __future__ import division
 """
 
 # Version 0.1
-# Last update : 23/03/2015 16:31
+# Last update : 23/03/2015 22:13
 
 import pyaudio
 import sys
@@ -31,11 +31,11 @@ import numpy as np
 from PyQt4 import Qt
 from PyQt4 import Qwt5 as Qwt
 
-from testStream import Signal
+from testSignal import Signal
 
 class Scope(Qwt.QwtPlot):
     
-    def __init__(self, signal, rate, size, *args):
+    def __init__(self, rate, size, *args):
         
         # signal characteristics
         self.size = size
@@ -44,7 +44,6 @@ class Scope(Qwt.QwtPlot):
         self.ti   = np.arange(0.0, 1.0, self.dt)
         self.a1   = 0.0*self.ti
         self.a2   = 0.0*self.ti
-        self.signal = signal
         
         
         # Graphic user interface
@@ -73,14 +72,13 @@ class Scope(Qwt.QwtPlot):
         
         
         # curves for scope traces: 2 first so 1 is on top
-        PENWIDTH = 1
         self.curve2 = Qwt.QwtPlotCurve('Trace2')
-        self.curve2.setPen(Qt.QPen(Qt.Qt.magenta,PENWIDTH))
+        self.curve2.setPen(Qt.QPen(Qt.Qt.magenta,1))
         self.curve2.setYAxis(Qwt.QwtPlot.yRight)
         self.curve2.attach(self)
 
         self.curve1 = Qwt.QwtPlotCurve('Trace1')
-        self.curve1.setPen(Qt.QPen(Qt.Qt.blue,PENWIDTH))
+        self.curve1.setPen(Qt.QPen(Qt.Qt.blue,1))
         self.curve1.setYAxis(Qwt.QwtPlot.yLeft)
         self.curve1.attach(self)
         
@@ -89,53 +87,43 @@ class Scope(Qwt.QwtPlot):
         self.curve2.setData(self.ti, self.a2)
         
     
-    def displaySignal(self):
+    def displaySignal(self, T):
         
         # plot scope traces
-        # basically, there is only 2 channels
+        # default : there is only 2 channels
+        
+        # signal to display
+        self.a1 = T[0]
+        self.a2 = T[1]
+        
+        # display
         l=len(self.a1)
         self.curve1.setData([0.0,0.0], [0.0,0.0])
         self.curve2.setData(self.ti[0:l], self.a2[:l])
         self.replot()
-        
-    def startScope(self):
-        
-        # get signal
-        self.signalStream = self.signal.getStream()
-        
-        x = self.signalStream.read(self.size)
-        X = np.fromstring(x, dtype='h') # 'h' -> signed short
-
-        cal = 1./65536.0
-        P = np.array(X, dtype='d')*cal  # 'd' -> double
-        R, L = P[0::2], P[1::2]
-        lenR = len(R)
-
-        L -= L.mean()
-        R -= R.mean()
-        self.a1 = R
-        self.a2 = L
-        self.displaySignal()
 
 
 def main():
     
     # signal properties
     rate       = 44100
-    size       = 1024
+    size       = 2048
 
-    # create a new signal
+    # create a new signal ready to be displayed in the scope
     signal = Signal(rate, size)
+    T = signal.getSignalForScope()
 
-    # create a scope window to display the signal
+    # create a scope window
     app  = Qt.QApplication(sys.argv)
-    f = Scope(signal, rate, size)
-    #f.displaySignal()
+    f = Scope(rate, size)
     
-    f.startScope()
-
+    # display the signal
+    f.displaySignal(T)
     f.show()
     app.exec_()
+    
+    # close the signal
+    signal.stopSignalStream()
     
 if __name__ == "__main__" :
     """ Test of Signal class """
