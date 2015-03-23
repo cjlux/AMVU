@@ -29,6 +29,7 @@ import pyaudio
 import sys
 import numpy as np
 from PyQt4 import Qt
+from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
 from testSignal import Signal
@@ -103,31 +104,51 @@ class Scope(Qwt.QwtPlot):
         self.replot()
 
 
-def main():
+def updateDisplay():
+    #signalStatus = signal.getNewAudioStatus()
+    if SR.newAudio :
+        T = SR.getSignalForScope()
+        scope.displaySignal(T)
+        #signal.setNewAudioStatus(False)
+        SR.newAudio = False
+
+if __name__ == "__main__" :
+    """ Test of Signal class """
     
     # signal properties
     rate       = 44100
-    size       = 2048
+    size       = 4096
 
     # create a new signal ready to be displayed in the scope
-    signal = Signal(rate, size)
-    T = signal.getSignalForScope()
+    SR = Signal(rate, size)
+    #T = signal.getSignalForScope()
 
     # create a scope window
-    app  = Qt.QApplication(sys.argv)
-    f = Scope(rate, size)
+    app         = Qt.QApplication(sys.argv)
+    mainWindow  = Qt.QMainWindow()
+    scope       = Scope(rate, size)
     
     # display the signal
-    f.displaySignal(T)
-    f.show()
+    #f.displaySignal(T)
+    #f.show()
+    #app.exec_()
+    
+    # display continuous signal
+    
+    # first solution
+    timer = QtCore.QTimer()
+    timer.start(1.0)
+    mainWindow.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+    
+    # second solution
+    
+    
+    SR.continuousStart()
+    scope.show()
     app.exec_()
     
     # close the signal
-    signal.stopSignalStream()
-    
-if __name__ == "__main__" :
-    """ Test of Signal class """
-    main()
+    SR.stopSignalStream()
 
 
 

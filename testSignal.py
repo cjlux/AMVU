@@ -27,7 +27,7 @@ from __future__ import division
 
 import pyaudio
 import numpy
-from threading import *
+from threading import Thread
 import time
 from PyQt4 import Qt
 from PyQt4 import Qwt5 as Qwt
@@ -38,8 +38,15 @@ class Signal():
 
     def __init__(self, rate, size) :
         """ Open a stream from the sound card """
-        self.rate = rate
-        self.size = size
+        
+        # state of recording
+        self.threadsDieNow  = False
+        self.newAudio       = False
+        
+        # signal characteristics
+        self.rate        = rate
+        self.size        = size
+        self.secToRecord = .1
         
         pyAudio = pyaudio.PyAudio()
         self.stream  = pyAudio.open( format            = pyaudio.paInt16, 
@@ -47,6 +54,13 @@ class Signal():
                                      input             = True,
                                      rate              = rate,
                                      frames_per_buffer = size)
+        
+#    def getNewAudioStatus(self):
+#        return self.newAudio
+    
+#    def setNewAudioStatus(self, status):
+#        self.newAudio = status
+    
         
     def getStream(self):
         """ Return the stream used for the current signal """
@@ -70,9 +84,9 @@ class Signal():
     
     def getSignalForScope(self):
         """ return an array containing formated signal for scope display """
-        X = self.readSignal(self.size)
-        cal = 1./65536.0
-        P = numpy.array(X, dtype='d')*cal  # 'd' -> double
+        X    = self.readSignal(self.size)
+        cal  = 1./65536.0
+        P    = numpy.array(X, dtype='d')*cal  # 'd' -> double
         R, L = P[0::2], P[1::2]
         lenR = len(R)
 
@@ -80,22 +94,30 @@ class Signal():
         R -= R.mean()
         return [L,R]
     
+    #
+    # Adapted for this class from swharden work at
+    # http://www.swharden.com/blog/2013-05-09-realtime-fft-audio-visualization-with-python/
+    #    
+    # ------------------------------------------------------
+    def record(self):
+        """record secToRecord seconds of audio."""
+        while not(self.threadsDieNow):
+            for i in range(int((self.rate/self.size)*self.secToRecord)):
+                # IOError: [Errno Input overflowed] -9981
+                self.audio[i*self.size:(i+1)*self.size]=self.readSignal(self.size)
+            self.newAudio=True 
+
+    def continuousStart(self):
+        """CALL THIS to start running forever."""
+        self.t = Thread(target=self.record)
+        self.t.start()
         
-    def displayContinuousSignal(self):
-        """ Display a part of the stream every seconds"""
-        bite = 0
-        self.bufferTotal = []
-        while True :
-            self.audioStream = self.readSignal(8)
-            self.printSignal()
-            self.bufferTotal.extend(self.audioStream)
-            bite = bite + 1
-            if bite==10 : break
-            
-        #time.sleep(0.5)
-        #self.displayContinuousSignal()
-        #t1 = Timer(1.0, self.displayContinuousSignal)
-        #t1.start()
+    def continuousEnd(self):
+        """shut down continuous recording."""
+        self.threadsDieNow=True
+
+    # ------------------------------------------------------
+
     
     def readStream(self, n):
         """ Read n value from the stream of the current signal"""
