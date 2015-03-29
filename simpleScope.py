@@ -22,12 +22,13 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.1
-# Last update : 23/03/2015 22:13
+# Version 0.2
+# Last update : 29/03/2015
 
 import pyaudio
 import sys
 import numpy as np
+
 from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
@@ -44,8 +45,7 @@ class Scope(Qwt.QwtPlot):
         self.dt   = 1./rate
         self.ti   = np.arange(0.0, 1.0, self.dt)
         self.a1   = 0.0*self.ti
-        self.a2   = 0.0*self.ti
-        
+        self.a2   = 0.0*self.ti     
         
         # Graphic user interface
         apply(Qwt.QwtPlot.__init__, (self,) + args)
@@ -61,7 +61,13 @@ class Scope(Qwt.QwtPlot):
         self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
         self.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
         self.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
-        self.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 10);
+        
+        # test to see if QwtPlot automatically adapt the scale
+        # TODO : find a way to display all the signal (it seems to
+        # have a display limit when the signal duration is too important)
+        self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine());
+        
+        self.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 20);
         self.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
 
         self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
@@ -69,8 +75,6 @@ class Scope(Qwt.QwtPlot):
         self.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
         self.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
         self.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
-        
-        
         
         # curves for scope traces: 2 first so 1 is on top
         self.curve2 = Qwt.QwtPlotCurve('Trace2')
@@ -91,7 +95,6 @@ class Scope(Qwt.QwtPlot):
     def displaySignal(self, T):
         
         # plot scope traces
-        # default : there is only 2 channels
         
         # signal to display
         self.a1 = T[0]
@@ -105,11 +108,16 @@ class Scope(Qwt.QwtPlot):
 
 
 def updateDisplay():
-    #signalStatus = signal.getNewAudioStatus()
+    
+    # test if there is a new portion of signal
+    # to display
     if SR.newAudio :
+        
+        # get signal and display it
         T = SR.getSignalForScope()
         scope.displaySignal(T)
-        #signal.setNewAudioStatus(False)
+
+        # this portion of signal have been displayed        
         SR.newAudio = False
 
 if __name__ == "__main__" :
@@ -121,29 +129,20 @@ if __name__ == "__main__" :
 
     # create a new signal ready to be displayed in the scope
     SR = Signal(rate, size)
-    #T = signal.getSignalForScope()
+    SR.continuousStart() # signal SR = current sound card record
+                         # at any time
 
     # create a scope window
     app         = Qt.QApplication(sys.argv)
     mainWindow  = Qt.QMainWindow()
     scope       = Scope(rate, size)
     
-    # display the signal
-    #f.displaySignal(T)
-    #f.show()
-    #app.exec_()
-    
     # display continuous signal
-    
-    # first solution
     timer = QtCore.QTimer()
     timer.start(1.0)
     mainWindow.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
     
-    # second solution
-    
-    
-    SR.continuousStart()
+    #show all the graphical stuff
     scope.show()
     app.exec_()
     

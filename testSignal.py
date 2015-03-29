@@ -22,8 +22,8 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.1
-# Last update : 23/03/2015 22:13
+# Version 0.2
+# Last update : 29/03/2015
 
 import pyaudio
 import numpy
@@ -44,16 +44,33 @@ class Signal():
         self.newAudio       = False
         
         # signal characteristics
-        self.rate        = rate
-        self.size        = size
-        self.secToRecord = .1
+        self.rate           = rate
+        self.size           = size
+        #self.secToRecord   = .1
+        self.signalPartSize = 1    # Size of a signal portion.
+                                   # A signal portion is what will be
+                                   # dynamically displayed if we choose
+                                   # to show the signal with
+                                   # a scope object for example
+        self.channel        = 2
         
-        pyAudio = pyaudio.PyAudio()
-        self.stream  = pyAudio.open( format            = pyaudio.paInt16, 
-                                     channels          = 2,
-                                     input             = True,
-                                     rate              = rate,
-                                     frames_per_buffer = size)
+        self.pyAudio = pyaudio.PyAudio()
+        self.stream  = self.pyAudio.open( format            = pyaudio.paInt16, 
+                                          channels          = self.channel,
+                                          input             = True,
+                                          rate              = rate,
+                                          frames_per_buffer = size)
+        
+        # current signal portion
+        self.signalPart  = numpy.empty(self.signalPartSize*self.size*self.channel,dtype=numpy.int16)  
+        
+        # all the signal portions since a signal object creation 
+        # <=> represent all the signal
+        self.signalParts = []
+        
+    #
+    # Unused getters ---
+    #
         
 #    def getNewAudioStatus(self):
 #        return self.newAudio
@@ -61,6 +78,7 @@ class Signal():
 #    def setNewAudioStatus(self, status):
 #        self.newAudio = status
     
+    # ------------------
         
     def getStream(self):
         """ Return the stream used for the current signal """
@@ -84,11 +102,19 @@ class Signal():
     
     def getSignalForScope(self):
         """ return an array containing formated signal for scope display """
-        X    = self.readSignal(self.size)
+        
+        # x represent all the recorded signal 
+        x = numpy.empty(len(self.signalParts)*self.signalPartSize*self.size*self.channel,dtype=numpy.int16)
+       
+        # display x on the command line terminal
+        for i in range(len(self.signalParts)):
+            x[i*self.signalPartSize*self.size*self.channel:(i+1)*self.signalPartSize*self.size*self.channel] = self.signalParts[i][0:self.signalPartSize*self.size*self.channel]        
+        print "Signal (size : "+str(len(x))+") : "+str(x)
+        
+        # display the current portion of signal
         cal  = 1./65536.0
-        P    = numpy.array(X, dtype='d')*cal  # 'd' -> double
+        P    = numpy.array(self.signalPart, dtype='d')*cal  # 'd' -> double
         R, L = P[0::2], P[1::2]
-        lenR = len(R)
 
         L -= L.mean()
         R -= R.mean()
@@ -100,12 +126,21 @@ class Signal():
     #    
     # ------------------------------------------------------
     def record(self):
-        """record secToRecord seconds of audio."""
+        """record a sample of audio."""
+        
+        # daemon recording as fast as it can the data from the sound card
         while not(self.threadsDieNow):
-            for i in range(int((self.rate/self.size)*self.secToRecord)):
-                # IOError: [Errno Input overflowed] -9981
-                self.audio[i*self.size:(i+1)*self.size]=self.readSignal(self.size)
-            self.newAudio=True 
+            
+            # all the readings from the sound card are recorder as signal portions
+            # TODO : Optimise by recording immediatly the readSignal(...) result in signalParts ?
+            for i in range(self.signalPartSize):
+                self.signalPart[i*self.size*self.channel:(i+1)*self.size*self.channel] = self.readSignal(self.size)
+
+            self.signalParts.append(numpy.copy(self.signalPart))
+            
+            # this portion of signal is new and doesn't have been displayed
+            # to the user
+            self.newAudio=True
 
     def continuousStart(self):
         """CALL THIS to start running forever."""
