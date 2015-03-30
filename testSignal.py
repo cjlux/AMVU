@@ -22,8 +22,8 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.2
-# Last update : 29/03/2015
+# Version 0.3
+# Last update : 30/03/2015
 
 import pyaudio
 import numpy
@@ -46,8 +46,7 @@ class Signal():
         # signal characteristics
         self.rate           = rate
         self.size           = size
-        #self.secToRecord   = .1
-        self.signalPartSize = 1    # Size of a signal portion.
+        self.signalPartSize = 1  # Size of a signal portion.
                                    # A signal portion is what will be
                                    # dynamically displayed if we choose
                                    # to show the signal with
@@ -100,16 +99,45 @@ class Signal():
         """ Give some information about the signal """
         return "Rate : "+str(self.rate)+" | Size : "+str(self.size)
     
-    def getSignalForScope(self):
-        """ return an array containing formated signal for scope display """
+    def getRecordedSignal(self):
+        """ Give the whole recorded signal """
         
         # x represent all the recorded signal 
         x = numpy.empty(len(self.signalParts)*self.signalPartSize*self.size*self.channel,dtype=numpy.int16)
        
-        # display x on the command line terminal
+        # format x
         for i in range(len(self.signalParts)):
-            x[i*self.signalPartSize*self.size*self.channel:(i+1)*self.signalPartSize*self.size*self.channel] = self.signalParts[i][0:self.signalPartSize*self.size*self.channel]        
-        print "Signal (size : "+str(len(x))+") : "+str(x)
+            x[i*self.signalPartSize*self.size*self.channel:(i+1)*self.signalPartSize*self.size*self.channel] = self.signalParts[i][0:self.signalPartSize*self.size*self.channel] 
+    
+        return x
+    
+    #
+    # Deprecated due to the use of pyqtgraph instead of Qwt
+    # to plot the whole recorded signal ---
+    #
+    
+#    def getRecordedSignalForScope(self):
+#        """ return an array containing the formated signal for scope display """
+#        
+#        cal  = 1./65536.0
+#        P    = numpy.array(self.getRecordedSignal(), dtype='d')*cal  # 'd' -> double
+#        R, L = P[0::2], P[1::2]
+
+#        L -= L.mean()
+#        R -= R.mean()
+#        return [L,R]
+
+    # -------------------------------------
+    
+    
+    def getSignalForScope(self):
+        """ return an array containing formated signal for scope display """
+
+        # display all the recorded signal on the command line terminal
+        x = self.getRecordedSignal()
+        print "Signal (size : "+str(len(x))+")   : "+str(x)
+        print "Signal part (size : "+str(len(self.signalPart))+") : "+str(self.signalPart)
+        print "-------------"
         
         # display the current portion of signal
         cal  = 1./65536.0
@@ -160,8 +188,11 @@ class Signal():
 
     def readSignal(self,n) :
         """ Read some data from this signal """
-        dataCollected = self.stream.read(n)
-        return numpy.fromstring(dataCollected,dtype=numpy.int16)
+        try :
+            dataCollected = self.stream.read(n)
+            return numpy.fromstring(dataCollected,dtype=numpy.int16)
+        except IOError :
+            return self.readSignal(n)
     
     def displayStream(self):
         """ Read and display all the stream """

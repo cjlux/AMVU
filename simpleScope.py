@@ -22,12 +22,14 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.2
-# Last update : 29/03/2015
+# Version 0.3
+# Last update : 30/03/2015
 
 import pyaudio
 import sys
 import numpy as np
+
+import pyqtgraph as pg
 
 from PyQt4 import Qt
 from PyQt4 import QtCore
@@ -49,6 +51,7 @@ class Scope(Qwt.QwtPlot):
         
         # Graphic user interface
         apply(Qwt.QwtPlot.__init__, (self,) + args)
+        self.setFixedSize(800,400)
         
         # grid
         self.grid = Qwt.QwtPlotGrid()
@@ -61,12 +64,7 @@ class Scope(Qwt.QwtPlot):
         self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
         self.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
         self.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
-        
-        # test to see if QwtPlot automatically adapt the scale
-        # TODO : find a way to display all the signal (it seems to
-        # have a display limit when the signal duration is too important)
-        self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine());
-        
+          
         self.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 20);
         self.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
 
@@ -111,42 +109,92 @@ def updateDisplay():
     
     # test if there is a new portion of signal
     # to display
-    if SR.newAudio :
+    if (SR.newAudio and not(SR.threadsDieNow)) :
         
         # get signal and display it
         T = SR.getSignalForScope()
-        scope.displaySignal(T)
+        print "[Display signal]"
+        SCOPE.displaySignal(T)
 
         # this portion of signal have been displayed        
         SR.newAudio = False
+        
+def seeRecord():
+    
+    # stop current signal acquisition
+    SR.threadsDieNow = True
+    
+    # display recorded signal
+    signalToDisplay = SR.getRecordedSignal()
+    print "[Display recorded signal]"
+    pg.plot(signalToDisplay) 
+
+    # TODO : try to use this instead of pg.plot :
+    #   win = pg.GraphicsWindow()  # Automatically generates grids with multiple items
+    #   win.addPlot(data1, row=0, col=0)
+    
+def startRecord():
+    
+    # restart current signal acquisition
+    SR.threadsDieNow = False
+    
+    # restart signal recording
+    SR.continuousStart() # signal SR = current sound card record
+                         # at any time
+    
+    # display continuous signal
+    timer = QtCore.QTimer()
+    timer.start(1.0)
+    MAINWINDOW.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
 
 if __name__ == "__main__" :
     """ Test of Signal class """
     
     # signal properties
-    rate       = 44100
-    size       = 4096
+    rate       = 8192   #44100
+    size       = 2048   #4096
 
     # create a new signal ready to be displayed in the scope
     SR = Signal(rate, size)
+    
+    # start signal recording
     SR.continuousStart() # signal SR = current sound card record
                          # at any time
 
     # create a scope window
     app         = Qt.QApplication(sys.argv)
-    mainWindow  = Qt.QMainWindow()
-    scope       = Scope(rate, size)
+    MAINWINDOW  = Qt.QMainWindow()
+    SCOPE       = Scope(rate, size)
+    
+    # create a button to display recorded signal
+    button2 = Qt.QPushButton("Continue record")
+    button2.clicked.connect(startRecord)
+    button2.show()
+    
+    # create a button to display recorded signal
+    button = Qt.QPushButton("See recorded signal")
+    button.clicked.connect(seeRecord)
+    button.show()
+    
+    # display this button on a toolbar
+    toolBar = Qt.QToolBar()
+    toolBar.addWidget(button)
+    toolBar.addWidget(button2)
+    MAINWINDOW.addToolBar(toolBar)
     
     # display continuous signal
     timer = QtCore.QTimer()
     timer.start(1.0)
-    mainWindow.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+    MAINWINDOW.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
     
     #show all the graphical stuff
-    scope.show()
+    MAINWINDOW.setCentralWidget(SCOPE)
+    MAINWINDOW.show()
+    SCOPE.show()
     app.exec_()
     
     # close the signal
+    SR.threadsDieNow = True
     SR.stopSignalStream()
 
 
