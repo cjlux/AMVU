@@ -22,8 +22,8 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.3
-# Last update : 30/03/2015
+# Version 1.0
+# Last update : 01/04/2015
 
 import pyaudio
 import sys
@@ -35,7 +35,7 @@ from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
-from testSignal import Signal
+from signalLast import Signal
 
 class Scope(Qwt.QwtPlot):
     
@@ -89,6 +89,8 @@ class Scope(Qwt.QwtPlot):
         self.curve1.setData(self.ti, self.a1)
         self.curve2.setData(self.ti, self.a2)
         
+        
+        # INIT GUI()
     
     def displaySignal(self, T):
         
@@ -112,7 +114,7 @@ def updateDisplay():
     if (SR.newAudio and not(SR.threadsDieNow)) :
         
         # get signal and display it
-        T = SR.getSignalForScope()
+        T = SR.getLastSignalRecordedPart()
         print "[Display signal]"
         SCOPE.displaySignal(T)
 
@@ -125,13 +127,10 @@ def seeRecord():
     SR.threadsDieNow = True
     
     # display recorded signal
-    signalToDisplay = SR.getRecordedSignal()
+    signalToDisplay = SR.getWellFormatedTimeSignal()[0]
     print "[Display recorded signal]"
     pg.plot(signalToDisplay) 
 
-    # TODO : try to use this instead of pg.plot :
-    #   win = pg.GraphicsWindow()  # Automatically generates grids with multiple items
-    #   win.addPlot(data1, row=0, col=0)
     
 def startRecord():
     
@@ -139,8 +138,8 @@ def startRecord():
     SR.threadsDieNow = False
     
     # restart signal recording
-    SR.continuousStart() # signal SR = current sound card record
-                         # at any time
+    SR.startRecording() # signal SR = current sound card record
+                        # at any time
     
     # display continuous signal
     timer = QtCore.QTimer()
@@ -152,13 +151,13 @@ if __name__ == "__main__" :
     
     # signal properties
     rate       = 8192   #44100
-    size       = 2048   #4096
+    size       = 2048    #4096
 
     # create a new signal ready to be displayed in the scope
     SR = Signal(rate, size)
     
     # start signal recording
-    SR.continuousStart() # signal SR = current sound card record
+    SR.startRecording()  # signal SR = current sound card record
                          # at any time
 
     # create a scope window
@@ -176,7 +175,7 @@ if __name__ == "__main__" :
     button.clicked.connect(seeRecord)
     button.show()
     
-    # display this button on a toolbar
+    # display this buttons on a toolbar
     toolBar = Qt.QToolBar()
     toolBar.addWidget(button)
     toolBar.addWidget(button2)

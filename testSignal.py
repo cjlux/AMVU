@@ -46,7 +46,7 @@ class Signal():
         # signal characteristics
         self.rate           = rate
         self.size           = size
-        self.signalPartSize = 1  # Size of a signal portion.
+        self.signalPartSize = 1    # Size of a signal portion.
                                    # A signal portion is what will be
                                    # dynamically displayed if we choose
                                    # to show the signal with
@@ -154,7 +154,7 @@ class Signal():
     #    
     # ------------------------------------------------------
     def record(self):
-        """record a sample of audio."""
+        """ Record a sample of audio."""
         
         # daemon recording as fast as it can the data from the sound card
         while not(self.threadsDieNow):
@@ -171,12 +171,12 @@ class Signal():
             self.newAudio=True
 
     def continuousStart(self):
-        """CALL THIS to start running forever."""
+        """ CALL THIS to start running forever."""
         self.t = Thread(target=self.record)
         self.t.start()
         
     def continuousEnd(self):
-        """shut down continuous recording."""
+        """ Shut down continuous recording."""
         self.threadsDieNow=True
 
     # ------------------------------------------------------
