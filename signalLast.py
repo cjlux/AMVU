@@ -29,9 +29,11 @@ from __future__ import division
 
 import pyaudio
 import numpy
+import wave
 from threading import Thread
-import time
+import time as t
 from PyQt4 import Qt
+from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
 
@@ -57,7 +59,7 @@ class Signal():
         self.size           = size
         self.channel        = channel
         self.format         = format
-        #self.offset ???
+        self.offset         = 0
         
         # sound acquisition
         self.soundCardLink    = pyaudio.PyAudio()
@@ -88,27 +90,94 @@ class Signal():
     def startRecording(self, time=None):
         """
         Start to record signal parts in timeSignal for time second if time is given
-        TODO : Currently, the recording time isn't given
         """
         self.recordingProcess = Thread(target=self.record)
         self.recordingProcess.start()
-    
-    def startTrigger(self, step):
-        """ Start to record signal when a step amplitude is reached by the signal """
-        print "[startTrigger(step)]"
-    
-    
-    def startTrigger(self, step, time):
-        """ Start to record signal when a step amplitude is reached by the signal for time second(s) """
-        print "[startTrigger(step, time)]"
         
+        # if time given, stop recording when time is reached
+        if time!=None :
+            t.sleep(time)
+            self.stopRecording()
+            
+    def __updateTriggerAnalysis(self, step, signalPartsRecording):
+        """
+        This function may not be called by class user.
+        Else it will probably cause huge dammages, like
+        end of the world, big explosions, etc...
         
+        Analyse a signal part to see if the trigger
+        is set off.
+        If it is, the signal start to be recorded.
+        If not, the signal is not recorded.
+        """
+        
+        # ready to record
+        self.threadsDieNow  = False
+        isTriggerSetOff     = False
+        
+        while not(isTriggerSetOff) :
+            
+            # test if there is a new portion of signal
+            # to analyze
+            if self.newAudio :
+            
+                # analyse signal part
+                for i in range(self.signalPart.size):
+                    # test if the current value is enough
+                    # to set off the trigger
+                    if (self.signalPart[i]>step) :
+                        # trigger is set off
+                        
+                        print "[startTrigger] start recording"
+    
+                        # end of signal parts recording
+                        # and trigger analysis
+                        signalPartsRecording.Terminated = True
+                        isTriggerSetOff = True
+                        
+                        # start recording the signal
+                        self.timeSignal.append(numpy.copy(self.signalPart))
+                        self.startRecording()
+                        break
+        
+                # this portion of signal have been analyzed      
+                self.newAudio = False
+            
+    #
+    # TODO : need to optimize
+    #
+    def startTrigger(self, step, time=None):
+        """
+        Start to record signal when a step amplitude is
+        reached by the signal for time second(s). If no time
+        is given, the trigger stop when threadsDieNow is true.
+        
+        Analyse a signal part to see if the trigger
+        is set off.
+        If it is, the signal start to be recorded.
+        If not, the signal is not recorded.
+        """
+        
+        print "[startTrigger("+str(step)+")]"
+        
+        # start signal parts recording
+        signalPartsRecording = Thread(target=self.__recordSignalPart)
+        signalPartsRecording.start()
+        
+        # signal analysis to start recording when trigger is set off
+        triggerAnalysis = Thread(target=self.__updateTriggerAnalysis(step, signalPartsRecording))
+        triggerAnalysis.start()
+        
+        # if time given, stop recording when time is reached
+        if time!=None :
+            t.sleep(time)
+            self.stopRecording()
     
     def stopRecording(self):
         """ Stop any recording currently running """
         self.threadsDieNow=True
         
-    def getLastSignalRecordedPart(self, ):
+    def getLastSignalRecordedPart(self):
         """
         Return the last recorded signal part
         * If channel number is 1   : an array of an array containing the signal values is returned
@@ -158,6 +227,9 @@ class Signal():
         # format x and give it back
         return Signal.getWellFormatedSignal(x, self.channel)
     
+    #
+    # = Under development ================
+    #
     def getBPFilteredTimeSignal(self):
         """
         Return band pass filtered time signal in a new signal object
@@ -178,7 +250,10 @@ class Signal():
         filteredSignal.setTimeSignal(filteredSignalParts)
         
         return filteredSignal
-        
+    
+    #
+    # = Under development ================
+    #    
     def getBPFilteredFreqSignal(self):
         """
         Return band pass filtered frequential signal in a new signal object
@@ -200,6 +275,9 @@ class Signal():
         
         return filteredSignal
     
+    #
+    # = Under development ================
+    #
     def getLPFilteredTimeSignal(self):
         """
         Return low pass time time signal in a new signal object
@@ -221,6 +299,9 @@ class Signal():
         
         return filteredSignal
     
+    #
+    # = Under development ================
+    #
     def getLPFilteredFreqSignal(self):
         """
         Return low pass filtered frequential signal in a new signal object
@@ -242,6 +323,9 @@ class Signal():
         
         return filteredSignal
     
+    #
+    # = Under development ================
+    #
     def getHPFilteredTimeSignal(self):
         """
         Return high pass filtered time signal in a new signal object
@@ -263,6 +347,9 @@ class Signal():
         
         return filteredSignal
     
+    #
+    # = Under development ================
+    #
     def getHPFilteredFreqSignal(self):
         """
         Return high pass filtered filtered signal in a new signal object
@@ -284,12 +371,26 @@ class Signal():
         
         return filteredSignal
     
+    #
+    # = Under development ================
+    #
     def exportWavFormat(self):
         """
-        Create a .wav file to store the recorded signal  
+        Create a exportedSignal.wav file to store the recorded signal  
         """
-        print "[ExportWavFormat]"
-    
+        print "[ExportWaveFormat]"
+        wavefile = wave.open("exportedSignal.wav", 'w')
+        
+        # set format characteristics
+        wavefile.setnchannels(self.channel)
+        wavefile.setframerate(self.rate)
+        wavefile.setsampwidth(self.size)
+        
+        # record signal
+        wavefile.writeframes(self.timeSignal)
+        
+        wavefile.close()
+        
     #-------------------------------------------------------------
     #
     # Utilities methods
@@ -414,6 +515,20 @@ class Signal():
             # this portion of signal is new and doesn't have been displayed
             # to the user
             self.newAudio=True
+            
+    def __recordSignalPart(self):
+        """ Record only parts of signal """
+        
+        # daemon recording as fast as it can the data from the sound card
+        while not(self.threadsDieNow):
+            
+            # all the readings from the sound card are recorder as signal portions
+            self.signalPart[0:self.size*self.channel] = self.readSignal(self.size)
+            
+            # this portion of signal is new and doesn't have been displayed
+            # to the user
+            self.newAudio=True
+    
 
     #def continuousStart(self):
     #    """ CALL THIS to start running forever."""

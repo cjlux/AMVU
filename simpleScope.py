@@ -115,7 +115,7 @@ def updateDisplay():
         
         # get signal and display it
         T = SR.getLastSignalRecordedPart()
-        print "[Display signal]"
+        #print "[Display signal]"
         SCOPE.displaySignal(T)
 
         # this portion of signal have been displayed        
@@ -131,6 +131,18 @@ def seeRecord():
     print "[Display recorded signal]"
     pg.plot(signalToDisplay) 
 
+
+def launchTrigger():
+    
+    # set the default value for the trigger
+    triggerStep = 12222
+    
+    # launch the trigger
+    SR.startTrigger(triggerStep, 4)
+    
+def exportFile():
+    SR.exportWavFormat()
+
     
 def startRecord():
     
@@ -140,6 +152,7 @@ def startRecord():
     # restart signal recording
     SR.startRecording() # signal SR = current sound card record
                         # at any time
+    #SR.startTrigger()
     
     # display continuous signal
     timer = QtCore.QTimer()
@@ -154,10 +167,10 @@ if __name__ == "__main__" :
     size       = 2048    #4096
 
     # create a new signal ready to be displayed in the scope
-    SR = Signal(rate, size)
+    SR  = Signal(rate, size)
     
     # start signal recording
-    SR.startRecording()  # signal SR = current sound card record
+    #SR.startRecording()  # signal SR = current sound card record
                          # at any time
 
     # create a scope window
@@ -165,20 +178,32 @@ if __name__ == "__main__" :
     MAINWINDOW  = Qt.QMainWindow()
     SCOPE       = Scope(rate, size)
     
-    # create a button to display recorded signal
+    # create a button to continue recording the signal
     button2 = Qt.QPushButton("Continue record")
     button2.clicked.connect(startRecord)
     button2.show()
+    
+    # create a button to start with a trigger
+    button1 = Qt.QPushButton("Start trigger")
+    button1.clicked.connect(launchTrigger)
+    button1.show()
     
     # create a button to display recorded signal
     button = Qt.QPushButton("See recorded signal")
     button.clicked.connect(seeRecord)
     button.show()
     
+    # create a button to export signal in wave file
+    button3 = Qt.QPushButton("Export .wav")
+    button3.clicked.connect(exportFile)
+    button3.show()
+    
     # display this buttons on a toolbar
     toolBar = Qt.QToolBar()
     toolBar.addWidget(button)
+    toolBar.addWidget(button1)
     toolBar.addWidget(button2)
+    toolBar.addWidget(button3)
     MAINWINDOW.addToolBar(toolBar)
     
     # display continuous signal
