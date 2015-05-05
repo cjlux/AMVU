@@ -42,17 +42,18 @@ class Plot(Qwt.QwtPlot):
     def __init__(self, a1, a2, dt) :
         
         # signal characteristics
-        self.dt   = dt
-        self.a1   = a1
-        self.a2   = a2
+        self.__dt     = dt
+        self.__a1     = a1
+        self.__a2     = a2
+        self.__offset = 0
         
-        # grid
-        self.grid = Qwt.QwtPlotGrid()
-        self.grid.enableXMin(True)
-        self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
-        self.grid.attach(self)
+        # define grid
+        self.__grid = Qwt.QwtPlotGrid()
+        self.__grid.enableXMin(True)
+        self.__grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
+        self.__grid.attach(self)
         
-        # axes
+        # define axes
         self.enableAxis(Qwt.QwtPlot.yRight);
         self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
         self.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
@@ -67,17 +68,22 @@ class Plot(Qwt.QwtPlot):
         self.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
         self.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
         
-        # curves for scope traces: 2 first so 1 is on top
-        self.curve2 = Qwt.QwtPlotCurve('Trace2')
-        self.curve2.setPen(Qt.QPen(Qt.Qt.magenta,1))
-        self.curve2.setYAxis(Qwt.QwtPlot.yRight)
-        self.curve2.attach(self)
+        # curves for scope traces
+        self.__curve2 = Qwt.QwtPlotCurve('Trace2')
+        self.__curve2.setPen(Qt.QPen(Qt.Qt.magenta,1))
+        self.__curve2.setYAxis(Qwt.QwtPlot.yRight)
+        self.__curve2.attach(self)
 
-        self.curve1 = Qwt.QwtPlotCurve('Trace1')
-        self.curve1.setPen(Qt.QPen(Qt.Qt.blue,1))
-        self.curve1.setYAxis(Qwt.QwtPlot.yLeft)
-        self.curve1.attach(self)
+        self.__curve1 = Qwt.QwtPlotCurve('Trace1')
+        self.__curve1.setPen(Qt.QPen(Qt.Qt.blue,1))
+        self.__curve1.setYAxis(Qwt.QwtPlot.yLeft)
+        self.__curve1.attach(self)
         
         # curve display initialisation
         self.curve1.setData(self.ti, self.a1)
         self.curve2.setData(self.ti, self.a2)
+        
+    def setOffset(self, newOffset):
+        self.__offset = newOffset
+    
+        
