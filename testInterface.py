@@ -5,7 +5,6 @@ from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
-
 import os,sys
 import Icons
 
@@ -17,13 +16,45 @@ class MainFrame(QMainWindow):
         QMainWindow.__init__(self)
         
         # tabs
-        self.tab1 = None
-        self.tab2 = None
+        self.timeGraphTab = None
+        self.freqGraphTab = None
         
         # control buttons
-        self.stack      = None
+        #self.stack      = None
         self.btnPause   = None
         self.grid       = None
+        
+        #
+        # Interface elements (widgets) 
+        #
+        self.globalInterface        = None
+        self.globalInterfaceRight   = None
+        self.globalInterfaceLeft    = None
+        self.globalInterfaceCenter  = None
+        
+        self.signalInformation  = None
+        self.controlPanelRight  = None
+        self.controlPanelLeft   = None
+        self.signalGraph        = None
+        
+        #
+        # Layouts
+        #
+        
+        # interface
+        self.globalInterfaceLayout        = None
+        self.globalInterfaceRightLayout   = None
+        self.globalInterfaceLeftLayout    = None
+        self.globalInterfaceCenterLayout  = None
+        
+        self.signalInformationLayout  = None
+        self.controlPanelRightLayout  = None
+        self.controlPanelLeftLayout   = None
+        self.signalGraphLayout        = None
+        
+        # graphs
+        self.timeGraphLayout    = None
+        self.freqGraphLayout    = None
         
         #
         # All this stuff if for the tab presentations
@@ -62,8 +93,8 @@ class MainFrame(QMainWindow):
 
         
         # graph for each tab
-        self.graph1 = None
-        self.graph2 = None
+        self.timeGraph = None
+        self.freqGraph = None
 
         
         # BUTTONS ------------------------------------------
@@ -83,25 +114,55 @@ class MainFrame(QMainWindow):
         # --------------------------------------------------
         #
         
-        CentralArea = QWidget()
-        self.setCentralWidget(CentralArea)
+        #
+        # Set the global interface and its layout
+        #
+        
+        # define all the global interface layouts
+        self.globalInterface = QWidget()
+        self.globalInterfaceLayout = QtGui.QGridLayout()
+        
+        self.globalInterfaceLeft = QWidget()
+        self.globalInterfaceLeftLayout = QtGui.QGridLayout()
+        self.globalInterfaceLeft.setLayout(self.globalInterfaceLeftLayout)
+        
+        self.globalInterfaceRight = QWidget()
+        self.globalInterfaceRightLayout = QtGui.QGridLayout()
+        self.globalInterfaceRight.setLayout(self.globalInterfaceRightLayout)
+        
+        self.globalInterfaceCenter = QWidget()
+        self.globalInterfaceCenterLayout = QtGui.QGridLayout()
+        self.globalInterfaceCenter.setLayout(self.globalInterfaceCenterLayout)
+        
+        # set the link between this interfaces
+        self.globalInterfaceLayout.addWidget(self.globalInterfaceLeft, 0, 0)
+        self.globalInterfaceLayout.addWidget(self.globalInterfaceCenter, 0, 1)
+        self.globalInterfaceLayout.addWidget(self.globalInterfaceRight, 0, 2)
+        
+        self.globalInterface.setLayout(self.globalInterfaceLayout)
+        
+        self.setCentralWidget(self.globalInterface)
 
 
     def setTitle(self, titre="") :
         self.setWindowTitle(titre)
 
-    def tab(self):
-        self.tab1 = QWidget() # création objet Widget pour recevoir onglet
-        self.tab2 = QWidget()
-
-        self.stack = QTabWidget(self) #mettre le self?
+    def setGraphTab(self):
         
-        self.stack.addTab(self.tab1,"Time")
-        self.stack.addTab(self.tab2,"Freq")
-        
-        self.setCentralWidget(self.stack)
+        # set each graph tab
+        self.timeGraphTab = QWidget() 
+        self.freqGraphTab = QWidget()
 
-    def toolBar(self):
+        # set the tab widget hosting each graph tab
+        self.signalGraph = QTabWidget(self) 
+        
+        self.signalGraph.addTab(self.timeGraphTab,"Time")
+        self.signalGraph.addTab(self.freqGraphTab,"Freq")
+        
+        # add the graph tab to the global interface
+        self.globalInterfaceLeftLayout.addWidget(self.signalGraph, 1, 0)
+
+    def setToolBar(self):
 
         toolBar = Qt.QToolBar(self) # création d'un lieu pouvant acceuillir widget
         self.addToolBar(toolBar) # ajout toolbar
@@ -169,46 +230,7 @@ class MainFrame(QMainWindow):
         btnHelp.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnHelp)
 ##        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()')
-
-        
-
-    
-##    def Scope (self):
-##
-##        
-##        # grid tab1
-##        babar=Qwt.QwtPlot(self.tab1)
-##        babar.replot()
-##        self.grid = Qwt.QwtPlotGrid()
-##        self.grid.enableXMin(True)
-##        self.grid.setMajPen(Qt.QPen(Qt.Qt.blue, 0, Qt.Qt.SolidLine))
-##        self.grid.attach(babar)
-##
-##        # grid tab2
-##        babar=Qwt.QwtPlot(self.tab2)
-##        babar.replot()
-##        self.grid = Qwt.QwtPlotGrid()
-##        self.grid.enableXMin(True)
-##        self.grid.setMajPen(Qt.QPen(Qt.Qt.blue, 0, Qt.Qt.SolidLine))
-##        self.grid.attach(babar)
-
-##
-##      
-##        # axes
-##
-##               
-##        self.enableAxis(Qwt.QwtPlot.yRight);
-##        self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
-##        self.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
-##        self.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
-##        self.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 10);
-##        self.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
-##
-##        self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
-##        self.setAxisMaxMajor(Qwt.QwtPlot.yLeft, 10);
-##        self.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
-##        self.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
-##        self.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);        
+       
 ##        
 
     def ExportPDF(self):
@@ -223,42 +245,43 @@ class MainFrame(QMainWindow):
     # SET THE GRAPHS FOR EACH TAB -----------------------------------------
     #
         
-    def setGraph1(self):
+    def setTimeGraph(self):
         # set the graph for the first tab
-        
-        self.graph1 = Qwt.QwtPlot()
+        # In this example, the graph is just a Qlabel
+        # This is where the link with others class will be
+        self.timeGraph = Qwt.QwtPlot()
 
         # grid
         self.grid = Qwt.QwtPlotGrid()
         self.grid.enableXMin(True)
         self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
-        self.grid.attach(self.graph1)
+        self.grid.attach(self.timeGraph)
         
         # add the graph to the interface using a layout
-        self.layoutGraph1 = QtGui.QGridLayout()
-        self.layoutGraph1.addWidget(self.graph1, 0, 0)
-        self.graphWidget1 = QtGui.QWidget()
-        self.graphWidget1.setLayout(self.layoutGraph1)
-
-                
+        #self.layoutGraph1 = QtGui.QGridLayout()
+        #self.layoutGraph1.addWidget(self.timeGraph, 0, 0)
+        #self.graphWidget1 = QtGui.QWidget()
+        #self.graphWidget1.setLayout(self.layoutGraph1)
     
-    def setGraph2(self):
-       
+    def setFreqGraph(self):
+        # set the graph for the second tab
+        # In this example, the graph is just a Qlabel
+        # This is where the link with others class will be
         
         # create the graph
-        self.graph2 = Qwt.QwtPlot()
+        self.freqGraph = Qwt.QwtPlot()
 
         # grid
         self.grid = Qwt.QwtPlotGrid()
         self.grid.enableXMin(True)
         self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
-        self.grid.attach(self.graph2)
+        self.grid.attach(self.freqGraph)
         
         # add the graph to the interface using a layout
-        self.layoutGraph2 = QtGui.QGridLayout()
-        self.layoutGraph2.addWidget(self.graph2, 0, 0)
-        self.graphWidget2 = QtGui.QWidget()
-        self.graphWidget2.setLayout(self.layoutGraph2)
+        #self.layoutGraph2 = QtGui.QGridLayout()
+        #self.layoutGraph2.addWidget(self.freqGraph, 0, 0)
+        #self.graphWidget2 = QtGui.QWidget()
+        #self.graphWidget2.setLayout(self.layoutGraph2)
 
     #
     # SET THE BUTTONS FOR EACH TAB ---------------------------------------
@@ -270,49 +293,52 @@ class MainFrame(QMainWindow):
     # countries, but nevermind... ).
     #
     
-    def setControl1(self):
-        # set the controls for the first tab
-        
-        # set a layout to clearly dispose all the buttons
-        self.layoutControls1 = QtGui.QGridLayout()
-        
-        # create all the control buttons
-        self.controlButton11 = QtGui.QPushButton("Button 1 - tab 1")
-        self.controlButton12 = QtGui.QPushButton("Button 2 - tab 1")
-        
-        # add this buttons to the layout
-        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
-        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
-        
-        # add this layout to the controls widget
-        self.controlWidget1 = QtGui.QWidget()
-        self.controlWidget1.setLayout(self.layoutControls1)
-
-        # create all the knob buttons
-            
-        
-        
-        
-
-        
-    
-    def setControl2(self):
-        # set the controls for the second tab
-        
-        # set a layout to clearly dispose all the buttons
-        self.layoutControls2 = QtGui.QGridLayout()
-        
-        # create all the control buttons
-        self.controlButton21 = QtGui.QPushButton("Button 1 - tab 2")
-        self.controlButton22 = QtGui.QPushButton("Button 1 - tab 2")
-        
-        # add this buttons to the layout
-        self.layoutControls2.addWidget(self.controlButton21, 0, 0)
-        self.layoutControls2.addWidget(self.controlButton22, 1, 0)
-        
-        # add this layout to the controls widget
-        self.controlWidget2 = QtGui.QWidget()
-        self.controlWidget2.setLayout(self.layoutControls2)
+#    def setControl1(self):
+#        # set the controls for the first tab
+#        
+#        # set a layout to clearly dispose all the buttons
+#        self.layoutControls1 = QtGui.QGridLayout()
+#        
+#        # create all the control buttons
+#        self.controlButton11 = QtGui.QPushButton("Button 1 - tab 1")
+#        self.controlButton12 = QtGui.QPushButton("Button 2 - tab 1")
+#        
+#        # add this buttons to the layout
+#        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
+#        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
+#        
+#        # add this layout to the controls widget
+#        self.controlWidget1 = QtGui.QWidget()
+#        self.controlWidget1.setLayout(self.layoutControls1)
+#
+#        # create all the knob buttons
+#        self.knobButton11 = Qwt.QwtKnob()
+#        
+#        self.knobButton12 = Qwt.QwtKnob()
+#        self.knobButton11.setTotalAngle(270)
+#
+#        # add this knobs to the layout
+#        
+#        self.layoutControls1.addWidget(self.knobButton11, 0, 1)
+#        self.layoutControls1.addWidget(self.knobButton12, 1, 1)
+         
+#    def setControl2(self):
+#        # set the controls for the second tab
+#        
+#        # set a layout to clearly dispose all the buttons
+#        self.layoutControls2 = QtGui.QGridLayout()
+#        
+#        # create all the control buttons
+#        self.controlButton21 = QtGui.QPushButton("Button 1 - tab 2")
+#        self.controlButton22 = QtGui.QPushButton("Button 1 - tab 2")
+#        
+#        # add this buttons to the layout
+#        self.layoutControls2.addWidget(self.controlButton21, 0, 0)
+#        self.layoutControls2.addWidget(self.controlButton22, 1, 0)
+#        
+#        # add this layout to the controls widget
+#        self.controlWidget2 = QtGui.QWidget()
+#        self.controlWidget2.setLayout(self.layoutControls2)
     
     
     #
@@ -321,31 +347,75 @@ class MainFrame(QMainWindow):
 
     def setScopes(self):
         
-# Create a layout for each tab
-        self.layoutTab1 = QtGui.QGridLayout()
-        self.layoutTab2 = QtGui.QGridLayout()
+        # create tabs to host graphs
+        self.setGraphTab()
         
-# Instanciate the controls and the graph from each scope
-        self.setGraph1()
-        self.setGraph2()
+        # create the graphs
+        self.setTimeGraph()
+        self.setFreqGraph()
         
-        self.setControl1()
-        self.setControl2()
+        # add the graphs to the tabs
+        self.timeGraphLayout = QtGui.QGridLayout()
+        self.freqGraphLayout = QtGui.QGridLayout()
         
-# Insert into this layouts the widget for the graph
-# and the widget for the control
-        self.layoutTab1.addWidget(self.graphWidget1, 0, 0)
-        self.layoutTab1.addWidget(self.controlWidget1, 0, 1)
+        self.timeGraphLayout.addWidget(self.timeGraph, 0, 0)
+        self.freqGraphLayout.addWidget(self.freqGraph, 0, 0)
         
-        self.layoutTab2.addWidget(self.graphWidget2, 0, 0)
-        self.layoutTab2.addWidget(self.controlWidget2, 0, 1)
+        self.timeGraphTab.setLayout(self.timeGraphLayout)
+        self.freqGraphTab.setLayout(self.freqGraphLayout)
+
+    def setSignalInformation(self):
         
-# Add the layout to the corresponding tab
-        self.tab1.setLayout(self.layoutTab1)
-        self.tab2.setLayout(self.layoutTab2)
+        # create a label to display information
+        self.informationLabel = QtGui.QLabel("Signal information : bla bla bla")
         
-        self.stack.show() # don't know if really usefull
+        # add this label to the global interface
+        self.signalInformationLayout = QtGui.QGridLayout()
+        self.signalInformationLayout.addWidget(self.informationLabel, 0, 0)
         
+        self.signalInformation = QWidget()
+        self.signalInformation.setLayout(self.signalInformationLayout)
+        
+        self.globalInterfaceLeftLayout.addWidget(self.signalInformation, 0, 0)
+        
+    def setControlPanelRight(self):
+        
+        # define the layout use to dispose the controls
+        self.controlPanelRightLayout = QtGui.QGridLayout()
+        
+        # set all the controls and add them to the layout
+        self.controlButton1 = Qwt.QwtKnob()
+        self.controlButton1.setTotalAngle(270)
+        self.controlButton2 = Qwt.QwtKnob()
+        self.controlButton2.setTotalAngle(270)
+        
+        self.controlPanelRightLayout.addWidget(self.controlButton1, 0, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton2, 1, 0)
+        
+        # add all this stuff to the global interface
+        self.controlPanelRight = QWidget()
+        self.controlPanelRight.setLayout(self.controlPanelRightLayout)
+        
+        self.globalInterfaceRightLayout.addWidget(self.controlPanelRight, 0, 0)
+        
+    def setControlPanelLeft(self):
+        
+        # define the layout use to dispose the controls
+        self.controlPanelLeftLayout = QtGui.QGridLayout()
+        
+        # set all the controls and add them to the layout
+        self.controlButton3 = QtGui.QPushButton("Button 1")
+        self.controlButton4 = QtGui.QPushButton("Button 2")
+        
+        self.controlPanelLeftLayout.addWidget(self.controlButton3, 0, 0)
+        self.controlPanelLeftLayout.addWidget(self.controlButton4, 1, 0)
+        
+        # add all this stuff to the global interface
+        self.controlPanelLeft = QWidget()
+        self.controlPanelLeft.setLayout(self.controlPanelLeftLayout)
+        
+        self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
+    
 
 def main(args):
 
@@ -354,9 +424,18 @@ def main(args):
     f = MainFrame()
 ##    f.SetMenu()
     f.setTitle("AMVU")
-    f.tab()
-    f.toolBar()
+    
+    # set the toolbar
+    f.setToolBar()
+    
+    # set the graphical elements of the interface
+    f.setSignalInformation()
     f.setScopes()
+    f.setControlPanelRight()
+    f.setControlPanelLeft()
+    
+    #f.setGraphTab()
+    #f.setScopes()
     f.show()
     r=a.exec_()
 

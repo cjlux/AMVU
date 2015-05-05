@@ -25,7 +25,7 @@ from __future__ import division
 """
 
 # Version 0.8
-# Last update : 02/04/2015
+# Last update : 18/04/2015
 
 import pyaudio
 import numpy
@@ -384,7 +384,7 @@ class Signal():
         # set format characteristics
         wavefile.setnchannels(self.channel)
         wavefile.setframerate(self.rate)
-        wavefile.setsampwidth(self.size)
+        wavefile.setsampwidth(self.format)
         
         # record signal
         wavefile.writeframes(self.timeSignal)
