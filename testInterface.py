@@ -5,6 +5,7 @@ from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
+
 import os,sys
 import Icons
 
@@ -224,24 +225,34 @@ class MainFrame(QMainWindow):
         
     def setGraph1(self):
         # set the graph for the first tab
-        # In this example, the graph is just a Qlabel
-        # This is where the link with others class will be
         
-        self.graph1 = QtGui.QLabel("Graphe 1")
+        self.graph1 = Qwt.QwtPlot()
+
+        # grid
+        self.grid = Qwt.QwtPlotGrid()
+        self.grid.enableXMin(True)
+        self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
+        self.grid.attach(self.graph1)
         
         # add the graph to the interface using a layout
         self.layoutGraph1 = QtGui.QGridLayout()
         self.layoutGraph1.addWidget(self.graph1, 0, 0)
         self.graphWidget1 = QtGui.QWidget()
         self.graphWidget1.setLayout(self.layoutGraph1)
+
+                
     
     def setGraph2(self):
-        # set the graph for the second tab
-        # In this example, the graph is just a Qlabel
-        # This is where the link with others class will be
+       
         
         # create the graph
-        self.graph2 = QtGui.QLabel("Graphe 2")
+        self.graph2 = Qwt.QwtPlot()
+
+        # grid
+        self.grid = Qwt.QwtPlotGrid()
+        self.grid.enableXMin(True)
+        self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
+        self.grid.attach(self.graph2)
         
         # add the graph to the interface using a layout
         self.layoutGraph2 = QtGui.QGridLayout()
@@ -278,15 +289,7 @@ class MainFrame(QMainWindow):
         self.controlWidget1.setLayout(self.layoutControls1)
 
         # create all the knob buttons
-        self.knobButton11 = LogKnob()
-        self.knobButton12 = LblKnob(self.controlWidget1,1,1,'name')
-
-        # add this knobs to the layout
-        
-        self.layoutControls1.addWidget(self.knobButton11, 0, 0)
-        
-        self.layoutControls1.addWidget(self.knobButton12, 1, 0)
-        
+            
         
         
         
