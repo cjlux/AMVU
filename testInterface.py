@@ -418,9 +418,15 @@ class MainFrame(QMainWindow):
         self.controlButton1.setTotalAngle(270)
         self.controlButton2 = Qwt.QwtKnob()
         self.controlButton2.setTotalAngle(270)
-        
+        self.controlButton3 = Qwt.QwtKnob()
+        self.controlButton3.setTotalAngle(270)
+        self.controlButton4 = Qwt.QwtKnob()
+        self.controlButton4.setTotalAngle(270)
+##        
         self.controlPanelRightLayout.addWidget(self.controlButton1, 0, 0)
         self.controlPanelRightLayout.addWidget(self.controlButton2, 1, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton3, 2, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton4, 3, 0)
         
         # add all this stuff to the global interface
         self.controlPanelRight = QWidget()
@@ -434,17 +440,19 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout = QtGui.QGridLayout()
         
         # set all the controls and add them to the layout
-        self.controlButton3 = QtGui.QPushButton("Button 1")
-        self.controlButton4 = QtGui.QPushButton("Button 2")
+        self.controlButton5 = QtGui.QPushButton("Button 1")
+        self.controlButton6 = QtGui.QPushButton("Button 2")
         
-        self.controlPanelLeftLayout.addWidget(self.controlButton3, 0, 0)
-        self.controlPanelLeftLayout.addWidget(self.controlButton4, 1, 0)
+        self.controlPanelLeftLayout.addWidget(self.controlButton5, 0, 0)
+        self.controlPanelLeftLayout.addWidget(self.controlButton6, 1, 0)
         
         # add all this stuff to the global interface
         self.controlPanelLeft = QWidget()
         self.controlPanelLeft.setLayout(self.controlPanelLeftLayout)
         
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
+
+        
     
 
 def main(args):
