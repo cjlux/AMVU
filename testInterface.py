@@ -1,3 +1,4 @@
+
 #-*-coding: utf-8 -*-
 from PyQt4 import QtGui
 from PyQt4.QtGui import QMainWindow,QWidget,QAction,QTabWidget,QApplication
@@ -258,6 +259,7 @@ class MainFrame(QMainWindow):
         # set the graph for the first tab
         # In this example, the graph is just a Qlabel
         # This is where the link with others class will be
+        
         self.timeGraph = Qwt.QwtPlot()
 
         # grid
@@ -265,6 +267,20 @@ class MainFrame(QMainWindow):
         self.grid.enableXMin(True)
         self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
         self.grid.attach(self.timeGraph)
+
+        # axes
+        self.timeGraph.enableAxis(Qwt.QwtPlot.yRight);
+        self.timeGraph.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
+        self.timeGraph.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
+        self.timeGraph.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
+        self.timeGraph.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 10);
+        self.timeGraph.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
+
+        self.timeGraph.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
+        self.timeGraph.setAxisMaxMajor(Qwt.QwtPlot.yLeft, 10);
+        self.timeGraph.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
+        self.timeGraph.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
+        self.timeGraph.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
         
         # add the graph to the interface using a layout
         #self.layoutGraph1 = QtGui.QGridLayout()
@@ -285,6 +301,20 @@ class MainFrame(QMainWindow):
         self.grid.enableXMin(True)
         self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
         self.grid.attach(self.freqGraph)
+
+        # axes
+        self.freqGraph.enableAxis(Qwt.QwtPlot.yRight);
+        self.freqGraph.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
+        self.freqGraph.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
+        self.freqGraph.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
+        self.freqGraph.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 10);
+        self.freqGraph.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
+
+        self.freqGraph.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
+        self.freqGraph.setAxisMaxMajor(Qwt.QwtPlot.yLeft, 10);
+        self.freqGraph.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
+        self.freqGraph.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
+        self.freqGraph.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
         
         # add the graph to the interface using a layout
         #self.layoutGraph2 = QtGui.QGridLayout()
@@ -415,8 +445,15 @@ class MainFrame(QMainWindow):
         self.controlButton2 = Qwt.QwtKnob()
         self.controlButton2.setTotalAngle(270)
         
+        self.controlButton3 = Qwt.QwtKnob()
+        self.controlButton3.setTotalAngle(270)
+        self.controlButton4 = Qwt.QwtKnob()
+        self.controlButton4.setTotalAngle(270)
+##        
         self.controlPanelRightLayout.addWidget(self.controlButton1, 0, 0)
         self.controlPanelRightLayout.addWidget(self.controlButton2, 1, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton3, 2, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton4, 3, 0)
         
         # add all this stuff to the global interface
         self.controlPanelRight = QWidget()
@@ -431,6 +468,7 @@ class MainFrame(QMainWindow):
 
         
         # set all the controls and add them to the layout
+
         self.checkboxStartRecording = QtGui.QCheckBox("",self)
         self.checkboxStartNsec = QtGui.QCheckBox("",self)
         self.checkboxStopRecording = QtGui.QCheckBox("",self)
@@ -480,12 +518,15 @@ class MainFrame(QMainWindow):
         self.checkboxHP.setToolTip('Activate the High Pass filter')
         self.checkboxBP.setToolTip('Activate the Band Pass filter')
         self.checkboxCut.setToolTip('Activate the Cut Band filter')
-        
+
+       
         # add all this stuff to the global interface
         self.controlPanelLeft = QWidget()
         self.controlPanelLeft.setLayout(self.controlPanelLeftLayout)
         
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
+
+        
     
 
 def main(args):
@@ -515,3 +556,4 @@ def main(args):
   
 if __name__=="__main__":
     main(sys.argv)
+#
