@@ -103,12 +103,21 @@ class MainFrame(QMainWindow):
         # Control buttons for each tab
         
         # for tab 1
-        self.controlButton11 = None
-        self.controlButton12 = None
+        self.checkboxStartRecording = None
+        self.checkboxStartNsec = None
+        self.checkboxStopRecording = None
+        self.checkboxTrigger = None
+        self.checkboxOffset = None
+        self.checkboxAntiNoise = None
+        self.checkboxDerivate = None
+        self.checkboxIntegrate = None
+        self.checkboxLP = None
+        self.checkboxHP = None
+        self.checkboxBP = None
+        self.checkboxCut = None
         
         # for tab 2
-        self.controlButton21 = None
-        self.controlButton22 = None
+        
         
         #
         # --------------------------------------------------
@@ -183,7 +192,7 @@ class MainFrame(QMainWindow):
         btnSave.setToolTip('Save in .wav')
         btnSave.setText("Save")
         btnSave.setIcon(Qt.QIcon(Qt.QPixmap("save")))
-        btnSave.setCheckable(True)
+        btnSave.setCheckable(False)
         btnSave.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnSave)
 ##        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()'))
@@ -226,7 +235,7 @@ class MainFrame(QMainWindow):
         btnHelp.setToolTip('Help')
         btnHelp.setText("Help")
         btnHelp.setIcon(Qt.QIcon("help.png"))
-        btnHelp.setCheckable(True)
+        btnHelp.setCheckable(False)
         btnHelp.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnHelp)
 ##        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()')
@@ -293,52 +302,69 @@ class MainFrame(QMainWindow):
     # countries, but nevermind... ).
     #
     
-#    def setControl1(self):
-#        # set the controls for the first tab
-#        
-#        # set a layout to clearly dispose all the buttons
-#        self.layoutControls1 = QtGui.QGridLayout()
-#        
-#        # create all the control buttons
-#        self.controlButton11 = QtGui.QPushButton("Button 1 - tab 1")
-#        self.controlButton12 = QtGui.QPushButton("Button 2 - tab 1")
-#        
-#        # add this buttons to the layout
-#        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
-#        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
-#        
-#        # add this layout to the controls widget
-#        self.controlWidget1 = QtGui.QWidget()
-#        self.controlWidget1.setLayout(self.layoutControls1)
-#
-#        # create all the knob buttons
-#        self.knobButton11 = Qwt.QwtKnob()
-#        
-#        self.knobButton12 = Qwt.QwtKnob()
-#        self.knobButton11.setTotalAngle(270)
-#
-#        # add this knobs to the layout
-#        
-#        self.layoutControls1.addWidget(self.knobButton11, 0, 1)
-#        self.layoutControls1.addWidget(self.knobButton12, 1, 1)
+    def setControl1(self):
+        # set the controls for the first tab
+        
+        # set a layout to clearly dispose all the buttons
+        self.layoutControls1 = QtGui.QGridLayout()
+        
+        # create all the control buttons
+        self.controlButton11 = QtGui.QPushButton("Button 1 tab 1")
+        self.controlButton12 = QtGui.QPushButton("Button 2 tab 1")
+        
+        self.checkboxStartRecording = QtGui.QCheckBox("",self)
+        self.checkboxStartNsec = QtGui.QCheckBox("",self)
+        self.checkboxStopRecording = QtGui.QCheckBox("",self)
+        self.checkboxTrigger = QtGui.QCheckBox("",self)        
+        self.checkboxOffset = QtGui.QCheckBox("",self)
+        
+        self.checkboxAntiNoise = QtGui.QCheckBox("",self)
+
+        self.checkboxDerivate = QtGui.QCheckBox("",self)
+        self.checkboxIntegrate = QtGui.QCheckBox("",self)
+
+        self.checkboxLP = QtGui.QCheckBox("",self)
+        self.checkboxHP = QtGui.QCheckBox("",self)
+        self.checkboxBP = QtGui.QCheckBox("",self)
+        self.checkboxCut = QtGui.QCheckBox("",self)
+       
+        # add this buttons to the layout
+        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
+        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
+        self.layoutControls1.addWidget(self.checkboxStartRecording, 1, 0)
+        
+        # add this layout to the controls widget
+        self.controlWidget1 = QtGui.QWidget()
+        self.controlWidget1.setLayout(self.layoutControls1)
+
+        # create all the knob buttons
+        self.knobButton11 = Qwt.QwtKnob()
+        
+        self.knobButton12 = Qwt.QwtKnob()
+        self.knobButton11.setTotalAngle(270)
+
+        # add this knobs to the layout
+        
+        self.layoutControls1.addWidget(self.knobButton11, 0, 1)
+        self.layoutControls1.addWidget(self.knobButton12, 1, 1)
          
-#    def setControl2(self):
-#        # set the controls for the second tab
-#        
-#        # set a layout to clearly dispose all the buttons
-#        self.layoutControls2 = QtGui.QGridLayout()
-#        
-#        # create all the control buttons
-#        self.controlButton21 = QtGui.QPushButton("Button 1 - tab 2")
-#        self.controlButton22 = QtGui.QPushButton("Button 1 - tab 2")
-#        
-#        # add this buttons to the layout
-#        self.layoutControls2.addWidget(self.controlButton21, 0, 0)
-#        self.layoutControls2.addWidget(self.controlButton22, 1, 0)
-#        
-#        # add this layout to the controls widget
-#        self.controlWidget2 = QtGui.QWidget()
-#        self.controlWidget2.setLayout(self.layoutControls2)
+    def setControl2(self):
+        # set the controls for the second tab
+        
+        # set a layout to clearly dispose all the buttons
+        self.layoutControls2 = QtGui.QGridLayout()
+        
+        # create all the control buttons
+        self.controlButton21 = QtGui.QPushButton("Button 1 - tab 2")
+        self.controlButton22 = QtGui.QPushButton("Button 1 - tab 2")
+       
+        # add this buttons to the layout
+        self.layoutControls2.addWidget(self.controlButton21, 0, 0)
+        self.layoutControls2.addWidget(self.controlButton22, 1, 0)
+               
+        # add this layout to the controls widget
+        self.controlWidget2 = QtGui.QWidget()
+        self.controlWidget2.setLayout(self.layoutControls2)
     
     
     #
@@ -402,13 +428,58 @@ class MainFrame(QMainWindow):
         
         # define the layout use to dispose the controls
         self.controlPanelLeftLayout = QtGui.QGridLayout()
+
         
         # set all the controls and add them to the layout
-        self.controlButton3 = QtGui.QPushButton("Button 1")
-        self.controlButton4 = QtGui.QPushButton("Button 2")
+        self.checkboxStartRecording = QtGui.QCheckBox("",self)
+        self.checkboxStartNsec = QtGui.QCheckBox("",self)
+        self.checkboxStopRecording = QtGui.QCheckBox("",self)
+        self.checkboxTrigger = QtGui.QCheckBox("",self)        
+        self.checkboxOffset = QtGui.QCheckBox("",self)
         
-        self.controlPanelLeftLayout.addWidget(self.controlButton3, 0, 0)
-        self.controlPanelLeftLayout.addWidget(self.controlButton4, 1, 0)
+        self.checkboxAntiNoise = QtGui.QCheckBox("",self)
+
+        self.checkboxDerivate = QtGui.QCheckBox("",self)
+        self.checkboxIntegrate = QtGui.QCheckBox("",self)
+
+        self.checkboxLP = QtGui.QCheckBox("",self)
+        self.checkboxHP = QtGui.QCheckBox("",self)
+        self.checkboxBP = QtGui.QCheckBox("",self)
+        self.checkboxCut = QtGui.QCheckBox("",self)
+        
+        
+        self.controlPanelLeftLayout.addWidget(self.checkboxStartRecording, 0, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxStartNsec, 1, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxStopRecording, 2, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxTrigger, 3, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 4, 0)
+
+        self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 5, 0)
+
+        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 6, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 0)
+
+        self.controlPanelLeftLayout.addWidget(self.checkboxLP, 8, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxHP, 9, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxBP, 10, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxCut, 11, 0)      
+
+        # add tooltips on each button
+        self.checkboxStartRecording.setToolTip('Start recording the measure')
+        self.checkboxStartNsec.setToolTip('Start recording the measure for a number of seconds specified. The record will automatically stop itself')
+        self.checkboxStopRecording.setToolTip('Stop recording the measure')
+        self.checkboxTrigger.setToolTip('Use the mode Trigger to automatically start recording for a threshold specified')
+        self.checkboxOffset.setToolTip('Add an offset to the measure ')
+
+        self.checkboxAntiNoise.setToolTip('Activate the antinoise filter')
+        
+        self.checkboxDerivate.setToolTip('Derivate the signal')
+        self.checkboxIntegrate.setToolTip('Integrate the signal')
+
+        self.checkboxLP.setToolTip('Activate the Low Pass filter')
+        self.checkboxHP.setToolTip('Activate the High Pass filter')
+        self.checkboxBP.setToolTip('Activate the Band Pass filter')
+        self.checkboxCut.setToolTip('Activate the Cut Band filter')
         
         # add all this stuff to the global interface
         self.controlPanelLeft = QWidget()
