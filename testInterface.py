@@ -8,7 +8,7 @@ from PyQt4 import Qwt5 as Qwt
 
 import os,sys
 import Icons
-
+import numpy as np
 
 class MainFrame(QMainWindow):
 
@@ -451,14 +451,38 @@ class MainFrame(QMainWindow):
         self.controlButton4.setTotalAngle(270)
 ##        
         self.controlPanelRightLayout.addWidget(self.controlButton1, 0, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButton2, 1, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButton3, 2, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButton4, 3, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton2, 2, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton3, 4, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButton4, 6, 0)
+        
+        # set  all buttons' Ranges
+
+        
+    
+
+        # Add text under each button
+
+        self.button1Text = Qt.QLabel("blabla1")
+        self.button1Text.setAlignment(QtCore.Qt.AlignCenter)
+        self.button2Text = Qt.QLabel("blabla2")
+        self.button2Text.setAlignment(QtCore.Qt.AlignCenter)
+        self.button3Text = Qt.QLabel("blabla3")
+        self.button3Text.setAlignment(QtCore.Qt.AlignCenter)
+        self.button4Text = Qt.QLabel("blabla4")
+        self.button4Text.setAlignment(QtCore.Qt.AlignCenter)
+
+        # set all the texts and add them to the layout
+
+        self.controlPanelRightLayout.addWidget(self.button1Text, 1, 0)
+        self.controlPanelRightLayout.addWidget(self.button2Text, 3, 0)
+        self.controlPanelRightLayout.addWidget(self.button3Text, 5, 0)
+        self.controlPanelRightLayout.addWidget(self.button4Text, 7, 0)   
+           
         
         # add all this stuff to the global interface
-        self.controlPanelRight = QWidget()
-        self.controlPanelRight.setLayout(self.controlPanelRightLayout)
         
+        self.controlPanelRight = QWidget()
+        self.controlPanelRight.setLayout(self.controlPanelRightLayout)        
         self.globalInterfaceRightLayout.addWidget(self.controlPanelRight, 0, 0)
         
     def setControlPanelLeft(self):
