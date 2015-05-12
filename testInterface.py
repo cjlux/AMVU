@@ -112,7 +112,7 @@ class MainFrame(QMainWindow):
         
         # Control buttons for each tab
         
-        # for tab 1
+        # for tab 1      
         self.checkboxStartRecording = None
         self.checkboxStartNsec = None
         self.checkboxStopRecording = None
@@ -132,9 +132,7 @@ class MainFrame(QMainWindow):
         self.InputBoxOffset = None
         self.InputBoxChanel1Sensibility = None
         self.InputBoxChanel2Sensibility = None
-        
-        # for tab 2
-        
+               
         
         #
         # --------------------------------------------------
@@ -169,8 +167,8 @@ class MainFrame(QMainWindow):
         
         self.setCentralWidget(self.globalInterface)
 
-        #change size
-        self.globalInterfaceCenter.setFixedSize(0.25*width_fenetre,700)
+        #change size of the widget
+        self.globalInterfaceCenter.setFixedSize(0.30*width_fenetre,height_fenetre)
 
 
     def setTitle(self, titre="") :
@@ -340,63 +338,7 @@ class MainFrame(QMainWindow):
         #self.graphWidget2 = QtGui.QWidget()
         #self.graphWidget2.setLayout(self.layoutGraph2)
 
-    #
-    # SET THE BUTTONS FOR EACH TAB ---------------------------------------
-    #
-    # This buttons are currently QPushButton objects.
-    # They can be knob, radio button, ... It only depends on the class used.
-    # This buttons aren't linked to an action for the moment : if someone
-    # click on them, nothing happen (except a nuclear explosion in some far away
-    # countries, but nevermind... ).
-    #
-    
-####    def setControl1(self):
-####        # set the controls for the first tab
-####        
-####        # set a layout to clearly dispose all the buttons
-####        self.layoutControls1 = QtGui.QGridLayout()
-####        
-####        # create all the control buttons
-####        self.controlButton11 = QtGui.QPushButton("Button 1 tab 1")
-####        self.controlButton12 = QtGui.QPushButton("Button 2 tab 1")
-####             
-####        # add this buttons to the layout
-####        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
-####        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
-####                
-####        # add this layout to the controls widget
-####        self.controlWidget1 = QtGui.QWidget()
-####        self.controlWidget1.setLayout(self.layoutControls1)
-####
-####        # create all the knob buttons
-####        self.knobButton11 = Qwt.QwtKnob()
-####        
-####        self.knobButton12 = Qwt.QwtKnob()
-####        self.knobButton11.setTotalAngle(270)
-####
-####        # add this knobs to the layout
-####        
-####        self.layoutControls1.addWidget(self.knobButton11, 0, 1)
-####        self.layoutControls1.addWidget(self.knobButton12, 1, 1)
-         
-    def setControl2(self):
-        # set the controls for the second tab
-        
-        # set a layout to clearly dispose all the buttons
-        self.layoutControls2 = QtGui.QGridLayout()
-        
-        # create all the control buttons
-        self.controlButton21 = QtGui.QPushButton("Button 1 - tab 2")
-        self.controlButton22 = QtGui.QPushButton("Button 1 - tab 2")
-       
-        # add this buttons to the layout
-        self.layoutControls2.addWidget(self.controlButton21, 0, 0)
-        self.layoutControls2.addWidget(self.controlButton22, 1, 0)
-               
-        # add this layout to the controls widget
-        self.controlWidget2 = QtGui.QWidget()
-        self.controlWidget2.setLayout(self.layoutControls2)
-    
+      
     
     #
     # ORGANIZE EACH TAB ---------------------------------------------
@@ -471,10 +413,9 @@ class MainFrame(QMainWindow):
         self.controlPanelRightLayout.addWidget(self.controlButton2, 2, 0)
         self.controlPanelRightLayout.addWidget(self.controlButton3, 4, 0)
         self.controlPanelRightLayout.addWidget(self.controlButton4, 6, 0)
-        
-        # set  all buttons' Ranges
 
         
+        # set  all buttons' Ranges     
     
 
         # Add text under each button
@@ -508,15 +449,15 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout = QtGui.QGridLayout()
         
         
-##        # define the layout use to dispose the text above the Filters checkbox
-##        self.checkboxAntiNoiseLayout = QtGui.QGridLayout()
-##        self.checkboxLPLayout = QtGui.QGridLayout()
-##        self.checkboxHPLayout = QtGui.QGridLayout()
-##        self.checkboxBPLayout = QtGui.QGridLayout()
-##        self.checkboxCutLayout =QtGui.QGridLayout()
+####        # define the layout use to dispose the text above the Filters checkbox
+####        self.checkboxAntiNoiseLayout = QtGui.QGridLayout()
+####        self.checkboxLPLayout = QtGui.QGridLayout()
+####        self.checkboxHPLayout = QtGui.QGridLayout()
+####        self.checkboxBPLayout = QtGui.QGridLayout()
+####        self.checkboxCutLayout =QtGui.QGridLayout()
 
         
-        # set all the controls
+        # set all the controls       
         self.checkboxStartRecording = QtGui.QCheckBox("",self)
         self.checkboxStartNsec = QtGui.QCheckBox("",self)
         self.checkboxStopRecording = QtGui.QCheckBox("",self)
@@ -580,9 +521,7 @@ class MainFrame(QMainWindow):
         self.checkboxLP.setToolTip('Activate the Low Pass filter')
         self.checkboxHP.setToolTip('Activate the High Pass filter')
         self.checkboxBP.setToolTip('Activate the Band Pass filter')
-        self.checkboxCut.setToolTip('Activate the Band Cut filter')
-
-        
+        self.checkboxCut.setToolTip('Activate the Band Cut filter')      
         
 
         #add text to all the buttons
@@ -619,17 +558,7 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxOffsetText, 13, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
-
-<<<<<<< HEAD
-##        #set Alignment to the text QLabel
-=======
-        #set Alignment to the text QLabel
->>>>>>> 3dd60e8578a60e92a558e9ccb513f14951fbd940
-##        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
-##        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
-##        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
-##        self.InputBoxOffsetText.setAlignment(QtCore.Qt.AlignRight)
-        
+    
         
         # add all this stuff to the global interface
         self.controlPanelLeft = QWidget()
@@ -637,12 +566,22 @@ class MainFrame(QMainWindow):
         
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
 
-       #put margins around the widget
+        #put margins around the widget
         self.controlPanelLeft.setContentsMargins( 0, 100, 0, 0)
-##
-##        #resize the width of the Widget
-##        self.controlPanelLeft.setMaximumWidth(213)
 
+        #add group button to make exclusive some of the checkbox
+        self.GroupRecording = QtGui.QButtonGroup(self.controlPanelLeft)
+        self.GroupMath = QtGui.QButtonGroup(self.controlPanelLeft)
+        self.GroupFilter = QtGui.QButtonGroup(self.controlPanelLeft)
+
+        #add the checkboxs to the group
+        self.GroupRecording.addButton(self.checkboxStartRecording)
+        self.GroupRecording.addButton(self.checkboxStopRecording)
+
+        #make the groups exclusive
+        self.GroupRecording.setExclusive(True)
+        
+        
         
     
 
