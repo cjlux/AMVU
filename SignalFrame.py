@@ -31,6 +31,7 @@ from Signal import Signal
 from TimePlot import TimePlot
 from FreqPlot import FreqPlot
 
+
 class SignalFrame():
     
     def __init__(self):
@@ -72,6 +73,8 @@ class SignalFrame():
             self.timeScope = self.signalList[self.currentSignal].getWellFormattedTimeSignal()
         # else : there isn't any previous signal to display
     
+        # TODO : call plot update for time and freq scope
+    
     def displayNextSignal(self):
         """
         Select the next signal in the signal list
@@ -83,14 +86,18 @@ class SignalFrame():
             self.timeScope = self.signalList[self.currentSignal].getWellFormattedTimeSignal()
         # else : there isn't any previous signal to display
     
+        # TODO : call plot update for time and freq scope
+    
     def displayLastSignal(self):
         """
         Select the last signal in the signal list
         and make it ready to display
         """
         self.currentSignal = len(self.signalList) - 1
-        self.freqScope = FreqPlot(self.signalList[self.currentSignal].getWellFormattedFreqSignal(), 0, 0)
-        self.timeScope = TimePlot(self.signalList[self.currentSignal].getWellFormattedTimeSignal(), 0, 0)
+        self.freqScope = FreqPlot(self.signalList[self.currentSignal].getWellFormattedFreqSignal(), self.signalList[self.currentSignal].rate, 0, 0)
+        self.timeScope = TimePlot(self.signalList[self.currentSignal].getWellFormattedTimeSignal(), self.signalList[self.currentSignal].rate, 0, 0)
+    
+        # TODO : call plot update for time and freq scope
     
     def displayDerivatedSignal(self):
         """
@@ -98,6 +105,8 @@ class SignalFrame():
         add it to the list and make it ready to display
         """
         print "[Display Derivated Signal]"
+        
+        # TODO : call plot update for time and freq scope
     
     def displayIntegratedSignal(self):
         """
@@ -105,6 +114,8 @@ class SignalFrame():
         add it to the list and make it ready to display
         """
         print "[Display Integrated Signal]"
+        
+        # TODO : call plot update for time and freq scope
     
     def displayFilteredSignal(self, filteringType, w0 = 0, w1 = 0):
         """
@@ -147,6 +158,7 @@ class SignalFrame():
             
         # make it ready to display
         self.displayLastSignal()
+        
     
     def displayContinuousSignal(self):
         """

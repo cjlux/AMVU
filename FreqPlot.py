@@ -31,13 +31,13 @@ from Plot import Plot
 
 class FreqPlot(Plot):
     
-    def __init__(self, signal, df = 0, fr = 0):
-        Plot.__init__(self, signal)
+    def __init__(self, dataToDisplay, rate, df = 0, fr = 0):
+        Plot.__init__(self, dataToDisplay, rate)
         self.df = df
         self.fr = fr
     
     
-    def __init__(self, a1, a2, dt, df = 0, fr = 0):
-        Plot.__init__(self, a1, a2, dt)
-        self.df = df
-        self.fr = fr
+    #def __init__(self, a1, a2, dt, df = 0, fr = 0):
+        #Plot.__init__(self, a1, a2, dt)
+        #self.df = df
+        #self.fr = fr

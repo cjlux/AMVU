@@ -42,15 +42,20 @@ class Scope(Qt.QMainWindow):
         
         Qt.QMainWindow.__init__(self)
         self.signalFrame = signalFrame
-        
-        # Graphic user interface
-        #apply(Qwt.QwtPlot.__init__, (self,) + args)
-        #self.setFixedSize(800,400)
-        
     
-    def displaySignal(self, T):
+    def displaySignal(self):
         
-        print "[Oh yeah, I update]"
+        #print "[Oh yeah, I display]"
+        
+        # get the data to display
+        dataToDisplay = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
+        rate          = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate
+        
+        #print dataToDisplay
+        
+        # display it
+        self.signalFrame.timeScope.update(dataToDisplay, rate)
+        
         # signal to display
         #self.a1 = T[0]
         #self.a2 = T[1]
@@ -64,14 +69,16 @@ class Scope(Qt.QMainWindow):
 
 def updateDisplay():
     
+    #print "[Oh yeah, I update]"
+    
     # test if there is a new portion of signal
     # to display
     if (SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].newAudio and not(SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow)) :
         
         # get signal and display it
-        T = SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
+        #T = SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
         #print "[Display signal]"
-        SCOPE.displaySignal(T)
+        SCOPE.displaySignal()
 
         # this portion of signal have been displayed        
         SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].newAudio = False
@@ -82,7 +89,7 @@ def seeRecord():
     SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = True
     
     # display recorded signal
-    signalToDisplay = SR.getWellFormatedTimeSignal()[0]
+    signalToDisplay = SIGNAL.getWellFormattedTimeSignal()[0]
     print "[Display recorded signal]"
     pg.plot(signalToDisplay) 
 
@@ -125,16 +132,22 @@ if __name__ == "__main__" :
     app = Qt.QApplication(sys.argv)
     
     # create a new signal ready to be displayed in the scope
-    firstSignal = Signal(rate, size)
+    SIGNAL = Signal(rate, size)
     signalFrame = SignalFrame()
-    signalFrame.consider(firstSignal)
+    #signalFrame.consider(SIGNAL)
     
     # create the scope
     SCOPE = Scope(signalFrame, rate, size)
     
     # affect a first signal to this scope
-    SCOPE.signalFrame.consider(firstSignal)
-    SCOPE.signalFrame.displayLastSignal()
+    SCOPE.signalFrame.consider(SIGNAL)
+    SCOPE.signalFrame.displayLastSignal() # initialize 2 plot for freq and time
+    
+    print "----------------------------------"
+    print SCOPE.signalFrame.timeScope
+    print SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal]
+    
+    startRecord()
     
     #SCOPE.signalFrame.timeScope # qwtplot
     #SCOPE.signalFrame.freqScope # qwtplot
@@ -175,6 +188,8 @@ if __name__ == "__main__" :
     
     #show all the graphical stuff
     #SCOPE.setCentralWidget(SCOPE.signalFrame.timeScope)
+    SCOPE.setCentralWidget(signalFrame.timeScope)
+    #signalFrame.show()
     SCOPE.show()
     SCOPE.signalFrame.timeScope.show()
     app.exec_()

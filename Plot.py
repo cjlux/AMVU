@@ -28,6 +28,7 @@ from __future__ import division
 # Last update : 05/05/2015
 
 import pyqtgraph as pg
+import numpy as np
 
 import sys
 
@@ -36,31 +37,39 @@ from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
 class Plot(Qwt.QwtPlot):
-    """ Plot allowing to diplay a signal """
+    """ Plot allowing to diplay data """
     
-    def __init__(self, signal):
-        a1 = signal.getWellFormattedTimeSignal()[0]
-        a2 = signal.getWellFormattedTimeSignal()[1]
-        dt = 1./signal.rate
-        self.__init__(a1, a2, dt)
+    def __init__(self, dataToDisplay, rate, *args):
+        
+        # record signal
+        self.dataToDisplay = dataToDisplay
+        
+        # currently wrote for 2 channels
+        a1 = dataToDisplay[0]
+        a2 = dataToDisplay[1]
+        dt = 1./rate
+        #self.__initPlot(a1, a2, dt)
 
-    def __init__(self, a1, a2, dt) :
+        #def __initPlot(self, a1, a2, dt, *args) :
         
         # signal characteristics
-        self.__dt     = dt
-        self.__a1     = a1
-        self.__a2     = a2
-        self.__offset = 0
+        self.dt     = dt
+        self.ti     = np.arange(0.0, 1.0, self.dt)
+        #self.a1     = a1
+        #self.a2     = a2
+        self.a1   = 0.0*self.ti
+        self.a2   = 0.0*self.ti
+        self.offset = 0
         
         # Graphic user interface
-        apply(Qwt.QwtPlot.__init__, (self))
+        apply(Qwt.QwtPlot.__init__, (self,) + args)
         self.setFixedSize(800,400)
         
         # define grid
-        self.__grid = Qwt.QwtPlotGrid()
-        self.__grid.enableXMin(True)
-        self.__grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
-        self.__grid.attach(self)
+        self.grid = Qwt.QwtPlotGrid()
+        self.grid.enableXMin(True)
+        self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
+        self.grid.attach(self)
         
         # define axes
         self.enableAxis(Qwt.QwtPlot.yRight);
@@ -78,21 +87,57 @@ class Plot(Qwt.QwtPlot):
         self.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
         
         # curves for scope traces
-        self.__curve2 = Qwt.QwtPlotCurve('Trace2')
-        self.__curve2.setPen(Qt.QPen(Qt.Qt.magenta,1))
-        self.__curve2.setYAxis(Qwt.QwtPlot.yRight)
-        self.__curve2.attach(self)
+        self.curve2 = Qwt.QwtPlotCurve('Trace2')
+        self.curve2.setPen(Qt.QPen(Qt.Qt.magenta,1))
+        self.curve2.setYAxis(Qwt.QwtPlot.yRight)
+        self.curve2.attach(self)
 
-        self.__curve1 = Qwt.QwtPlotCurve('Trace1')
-        self.__curve1.setPen(Qt.QPen(Qt.Qt.blue,1))
-        self.__curve1.setYAxis(Qwt.QwtPlot.yLeft)
-        self.__curve1.attach(self)
+        self.curve1 = Qwt.QwtPlotCurve('Trace1')
+        self.curve1.setPen(Qt.QPen(Qt.Qt.blue,1))
+        self.curve1.setYAxis(Qwt.QwtPlot.yLeft)
+        self.curve1.attach(self)
         
         # curve display initialisation
+        #l = len(self.a1)
         self.curve1.setData(self.ti, self.a1)
         self.curve2.setData(self.ti, self.a2)
         
+        # plot scope traces
+        
+        # signal to display
+        self.a1 = dataToDisplay[0]
+        self.a2 = dataToDisplay[1]
+        
+        # display
+        l=len(self.a1)
+        self.curve1.setData([0.0,0.0], [0.0,0.0])
+        self.curve2.setData(self.ti[0:l], self.a2[:l])
+        
+        self.replot()
+        
     def setOffset(self, newOffset):
-        self.__offset = newOffset
+        self.offset = newOffset
+        
+    def update(self, dataToDisplay, rate):
+        
+        # get the new values of the plotted signal
+        # currently wrote for 2 channels
+        self.a1 = dataToDisplay[0]
+        self.a2 = dataToDisplay[1]
+        self.dt = 1./rate
+        self.ti = np.arange(0.0, 1.0, self.dt)
+        
+        print "----------------------"
+        #print dataToDisplay
+        print self.a1
+        print self.a2
+        
+        l=len(self.a1)
+        self.curve1.setData([0.0,0.0], [0.0,0.0])
+        self.curve2.setData(self.ti[0:l], self.a2[:l])
+        self.replot()
+        
+        print "[Oh yeah, I update]"
+    
     
         
