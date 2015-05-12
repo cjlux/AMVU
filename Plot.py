@@ -27,17 +27,22 @@ from __future__ import division
 # Version 0.1
 # Last update : 05/05/2015
 
-import pyaudio
-import numpy
-import wave
-from threading import Thread
-import time as t
+import pyqtgraph as pg
+
+import sys
+
 from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
 class Plot(Qwt.QwtPlot):
     """ Plot allowing to diplay a signal """
+    
+    def __init__(self, signal):
+        a1 = signal.getWellFormattedTimeSignal()[0]
+        a2 = signal.getWellFormattedTimeSignal()[1]
+        dt = 1./signal.rate
+        self.__init__(a1, a2, dt)
 
     def __init__(self, a1, a2, dt) :
         
@@ -46,6 +51,10 @@ class Plot(Qwt.QwtPlot):
         self.__a1     = a1
         self.__a2     = a2
         self.__offset = 0
+        
+        # Graphic user interface
+        apply(Qwt.QwtPlot.__init__, (self))
+        self.setFixedSize(800,400)
         
         # define grid
         self.__grid = Qwt.QwtPlotGrid()

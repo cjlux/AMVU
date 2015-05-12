@@ -189,7 +189,7 @@ class Signal():
         # format the last recorded signal part and give it back
         return Signal.getWellFormatedSignal(self.signalPart, self.channel)
     
-    def getWellFormatedTimeSignal(self):
+    def getWellFormattedTimeSignal(self):
         """
         Return time signal on an adapted form to display it
         * If channel number is 1   : an array of an array containing the signal values is returned
@@ -208,7 +208,7 @@ class Signal():
         # format x and give it back
         return Signal.getWellFormatedSignal(x, self.channel)
     
-    def getWellFormatedFreqSignal(self):
+    def getWellFormattedFreqSignal(self):
         """
         Return frequential signal on an adapted form to display it
         * If channel number is 1   : an array of an array containing the signal values is returned
@@ -230,9 +230,10 @@ class Signal():
     #
     # = Under development ================
     #
-    def getBPFilteredTimeSignal(self):
+    def getBPFilteredTimeSignal(self, w0, w1):
         """
         Return band pass filtered time signal in a new signal object
+        w0 and w1 stand for the cutoff frequencies.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
@@ -254,9 +255,10 @@ class Signal():
     #
     # = Under development ================
     #    
-    def getBPFilteredFreqSignal(self):
+    def getBPFilteredFreqSignal(self, w0, w1):
         """
         Return band pass filtered frequential signal in a new signal object
+        w0 and w1 stand for the cutoff frequencies.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
@@ -278,9 +280,10 @@ class Signal():
     #
     # = Under development ================
     #
-    def getLPFilteredTimeSignal(self):
+    def getLPFilteredTimeSignal(self, w0):
         """
         Return low pass time time signal in a new signal object
+        w0 stands for the cutoff frequency.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
@@ -302,9 +305,10 @@ class Signal():
     #
     # = Under development ================
     #
-    def getLPFilteredFreqSignal(self):
+    def getLPFilteredFreqSignal(self, w0):
         """
         Return low pass filtered frequential signal in a new signal object
+        w0 stands for the cutoff frequency.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
@@ -326,9 +330,10 @@ class Signal():
     #
     # = Under development ================
     #
-    def getHPFilteredTimeSignal(self):
+    def getHPFilteredTimeSignal(self, w0):
         """
         Return high pass filtered time signal in a new signal object
+        w0 stands for the cutoff frequency.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
@@ -350,9 +355,10 @@ class Signal():
     #
     # = Under development ================
     #
-    def getHPFilteredFreqSignal(self):
+    def getHPFilteredFreqSignal(self, w0):
         """
         Return high pass filtered filtered signal in a new signal object
+        w0 stands for the cutoff frequency.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode

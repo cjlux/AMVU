@@ -25,13 +25,19 @@ from __future__ import division
 """
 
 # Version 0.1
-# Last update : 05/05/2015
+# Last update : 06/05/2015
 
-import pyaudio
-import numpy
-import wave
-from threading import Thread
-import time as t
-from PyQt4 import Qt
-from PyQt4 import QtCore
-from PyQt4 import Qwt5 as Qwt
+from Plot import Plot
+
+class TimePlot(Plot):
+    
+    def __init__(self, signal, df=0, fr=0):
+        Plot.__init__(self, signal)
+        self.df = df
+        self.fr = fr
+    
+    
+    def __init__(self, a1, a2, dt, df=0, fr=0):
+        Plot.__init__(self, a1, a2, dt)
+        self.df = df
+        self.fr = fr
