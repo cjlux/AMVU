@@ -178,6 +178,8 @@ if __name__ == "__main__" :
     MAINWINDOW  = Qt.QMainWindow()
     SCOPE       = Scope(rate, size)
     
+    startRecord()
+    
     # create a button to continue recording the signal
     button2 = Qt.QPushButton("Continue record")
     button2.clicked.connect(startRecord)

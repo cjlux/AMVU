@@ -10,14 +10,28 @@ import os,sys
 import Icons
 import numpy as np
 
+import pyqtgraph as pg
+
+from Signal import Signal
+from SignalFrame import SignalFrame
+
+#
+# Global values
+#
+
+# stand for the MainFrame object used
+# in different function
+SCOPE = None
+
+
 class MainFrame(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, signalFrame):
         
         QMainWindow.__init__(self)
 
-       
-
+        # signal frame for signal display and management
+        self.signalFrame = signalFrame
       
         #know the size of the main frame
         size_fenetre = self.geometry()
@@ -75,36 +89,36 @@ class MainFrame(QMainWindow):
 
 
         # Layouts for each tabs
-        self.layoutTab1 = None
-        self.layoutTab2 = None
+        #self.layoutTab1 = None
+        #self.layoutTab2 = None
         
         # Layouts for the controls
-        self.layoutControls1 = None
-        self.layoutControls2 = None
+        #self.layoutControls1 = None
+        #self.layoutControls2 = None
         
         # Layouts for the graphs
-        self.layoutGraph1 = None
-        self.layoutGraph2 = None
+        #self.layoutGraph1 = None
+        #self.layoutGraph2 = None
 
         
         # WIDGETS ------------------------------------------
 
         
         # Control widget for each tab
-        self.controlWidget1 = None
-        self.controlWidget2 = None
+        #self.controlWidget1 = None
+        #self.controlWidget2 = None
         
         # Graph widget for each tab
-        self.graphWidget1 = None
-        self.graphWidget2 = None
+        #self.graphWidget1 = None
+        #self.graphWidget2 = None
         
         
         # GRAPHS ------------------------------------------
 
         
         # graph for each tab
-        self.timeGraph = None
-        self.freqGraph = None
+        #self.timeGraph = None
+        #self.freqGraph = None
 
         
         # BUTTONS ------------------------------------------
@@ -112,7 +126,12 @@ class MainFrame(QMainWindow):
         
         # Control buttons for each tab
         
+#<<<<<<< Updated upstream
         # for tab 1      
+#=======
+        # for tab 1
+#<<<<<<< Updated upstream
+#>>>>>>> Stashed changes
         self.checkboxStartRecording = None
         self.checkboxStartNsec = None
         self.checkboxStopRecording = None
@@ -125,6 +144,7 @@ class MainFrame(QMainWindow):
         self.checkboxHP = None
         self.checkboxBP = None
         self.checkboxCut = None
+#<<<<<<< Updated upstream
         self.InputBoxNSecond = None
         self.InputBoxFrequency1 = None
         self.InputBoxFrequency2 = None
@@ -133,6 +153,19 @@ class MainFrame(QMainWindow):
         self.InputBoxChanel1Sensibility = None
         self.InputBoxChanel2Sensibility = None
                
+#=======
+        
+        # for tab 2
+        
+#=======
+        #self.controlButton11 = None
+        #self.controlButton12 = None
+        
+        # for tab 2
+        #self.controlButton21 = None
+        #self.controlButton22 = None
+#>>>>>>> Stashed changes
+#>>>>>>> Stashed changes
         
         #
         # --------------------------------------------------
@@ -168,8 +201,7 @@ class MainFrame(QMainWindow):
         self.setCentralWidget(self.globalInterface)
 
         #change size of the widget
-        self.globalInterfaceCenter.setFixedSize(0.30*width_fenetre,height_fenetre)
-
+        self.globalInterfaceCenter.setFixedSize(0.50*width_fenetre,height_fenetre)
 
     def setTitle(self, titre="") :
         self.setWindowTitle(titre)
@@ -267,78 +299,6 @@ class MainFrame(QMainWindow):
     def ExportPNG(self):
         # Export in PNG mode
         print('ExportPNG')
-        
-    #
-    # SET THE GRAPHS FOR EACH TAB -----------------------------------------
-    #
-        
-    def setTimeGraph(self):
-        # set the graph for the first tab
-        # In this example, the graph is just a Qlabel
-        # This is where the link with others class will be
-        
-        self.timeGraph = Qwt.QwtPlot()
-
-        # grid
-        self.grid = Qwt.QwtPlotGrid()
-        self.grid.enableXMin(True)
-        self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
-        self.grid.attach(self.timeGraph)
-
-        # axes
-        self.timeGraph.enableAxis(Qwt.QwtPlot.yRight);
-        self.timeGraph.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
-        self.timeGraph.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
-        self.timeGraph.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
-        self.timeGraph.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 10);
-        self.timeGraph.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
-
-        self.timeGraph.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
-        self.timeGraph.setAxisMaxMajor(Qwt.QwtPlot.yLeft, 10);
-        self.timeGraph.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
-        self.timeGraph.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
-        self.timeGraph.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
-        
-        # add the graph to the interface using a layout
-        #self.layoutGraph1 = QtGui.QGridLayout()
-        #self.layoutGraph1.addWidget(self.timeGraph, 0, 0)
-        #self.graphWidget1 = QtGui.QWidget()
-        #self.graphWidget1.setLayout(self.layoutGraph1)
-    
-    def setFreqGraph(self):
-        # set the graph for the second tab
-        # In this example, the graph is just a Qlabel
-        # This is where the link with others class will be
-        
-        # create the graph
-        self.freqGraph = Qwt.QwtPlot()
-
-        # grid
-        self.grid = Qwt.QwtPlotGrid()
-        self.grid.enableXMin(True)
-        self.grid.setMajPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.SolidLine))
-        self.grid.attach(self.freqGraph)
-
-        # axes
-        self.freqGraph.enableAxis(Qwt.QwtPlot.yRight);
-        self.freqGraph.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
-        self.freqGraph.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
-        self.freqGraph.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
-        self.freqGraph.setAxisMaxMajor(Qwt.QwtPlot.xBottom, 10);
-        self.freqGraph.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
-
-        self.freqGraph.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
-        self.freqGraph.setAxisMaxMajor(Qwt.QwtPlot.yLeft, 10);
-        self.freqGraph.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
-        self.freqGraph.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
-        self.freqGraph.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
-        
-        # add the graph to the interface using a layout
-        #self.layoutGraph2 = QtGui.QGridLayout()
-        #self.layoutGraph2.addWidget(self.freqGraph, 0, 0)
-        #self.graphWidget2 = QtGui.QWidget()
-        #self.graphWidget2.setLayout(self.layoutGraph2)
-
       
     
     #
@@ -351,12 +311,11 @@ class MainFrame(QMainWindow):
         self.setGraphTab()
         
         # create the graphs
-        self.setTimeGraph()
-        self.setFreqGraph()
+        self.timeGraph =  self.signalFrame.timeScope
+        self.freqGraph =  self.signalFrame.freqScope
         
         # add the graphs to the tabs
         self.timeGraphLayout = QtGui.QGridLayout()
-##        self.timeGraphLayout.setSpacing(0)
         self.freqGraphLayout = QtGui.QGridLayout()
         
         self.timeGraphLayout.addWidget(self.timeGraph, 0, 0)
@@ -400,20 +359,28 @@ class MainFrame(QMainWindow):
         self.controlPanelRightLayout = QtGui.QGridLayout()
         
         # set all the controls and add them to the layout
-        self.controlButton1 = Qwt.QwtKnob()
-        self.controlButton1.setTotalAngle(270)
-        self.controlButton2 = Qwt.QwtKnob()
-        self.controlButton2.setTotalAngle(270)
+        self.controlButtonVerticalScale = Qwt.QwtKnob()
+        self.controlButtonVerticalScale.setTotalAngle(270)
+        self.controlButtonHorizontalScale = Qwt.QwtKnob()
+        self.controlButtonHorizontalScale.setTotalAngle(270)
         
-        self.controlButton3 = Qwt.QwtKnob()
-        self.controlButton3.setTotalAngle(270)
-        self.controlButton4 = Qwt.QwtKnob()
-        self.controlButton4.setTotalAngle(270)
+        self.controlButtonSize = Qwt.QwtKnob()
+        self.controlButtonSize.setTotalAngle(270)
+        self.controlButtonRate = Qwt.QwtKnob()
+        self.controlButtonRate.setTotalAngle(270)
+        
+        #rate       = 8192   #44100
+        #size       = 2048    #4096
+        
+        self.controlButtonSize.setScale(512, 4096, 512)
+        self.controlButtonSize.setRange(512, 4096)
+        self.controlButtonRate.setScale(8192, 44100, 4096)
+        self.controlButtonRate.setRange(8192, 44100)
 ##        
-        self.controlPanelRightLayout.addWidget(self.controlButton1, 0, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButton2, 2, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButton3, 4, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButton4, 6, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonVerticalScale, 0, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale, 2, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonSize, 4, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonRate, 6, 0)
 
         
         # set  all buttons' Ranges     
@@ -421,13 +388,13 @@ class MainFrame(QMainWindow):
 
         # Add text under each button
 
-        self.button1Text = Qt.QLabel("blabla1")
+        self.button1Text = Qt.QLabel("Vertical Scale")
         self.button1Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button2Text = Qt.QLabel("blabla2")
+        self.button2Text = Qt.QLabel("Horizontal Scale")
         self.button2Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button3Text = Qt.QLabel("blabla3")
+        self.button3Text = Qt.QLabel("Size")
         self.button3Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button4Text = Qt.QLabel("blabla4")
+        self.button4Text = Qt.QLabel("Rate")
         self.button4Text.setAlignment(QtCore.Qt.AlignCenter)
 
         # set all the texts and add them to the layout
@@ -459,9 +426,16 @@ class MainFrame(QMainWindow):
 
         
         # set all the controls       
-        self.checkboxStartRecording = QtGui.QCheckBox("",self)
-        self.checkboxStartNsec = QtGui.QCheckBox("",self)
-        self.checkboxStopRecording = QtGui.QCheckBox("",self)
+        
+        # S122 : i think it's better for the main control to be buttons
+        #        they are the control the user use the most, they have
+        #        to be wide and different from the others controls
+        self.checkboxStartRecording = QtGui.QPushButton("Start",self)
+        self.checkboxStopRecording = QtGui.QCheckBox("Stop",self)
+        # ---------------------------------------------------------------
+        
+        self.checkboxStartNsec = QtGui.QPushButton("",self)
+        
         self.checkboxTrigger = QtGui.QCheckBox("",self)        
         self.checkboxOffset = QtGui.QCheckBox("",self)
         
@@ -559,7 +533,7 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxOffsetText, 13, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
-<<<<<<< HEAD
+#<<<<<<< HEAD
 
         # create the frames aroud the checkboxs
        
@@ -578,9 +552,9 @@ class MainFrame(QMainWindow):
 ##        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
 ##        self.InputBoxOffsetText.setAlignment(QtCore.Qt.AlignRight)
         
-=======
+#=======
     
->>>>>>> 2fa4b70b82c65a2ac6ef41b160a3d131f1f52808
+#>>>>>>> 2fa4b70b82c65a2ac6ef41b160a3d131f1f52808
         
         # add all this stuff to the global interface
         self.controlPanelLeft = QWidget()
@@ -603,32 +577,183 @@ class MainFrame(QMainWindow):
         #make the groups exclusive
         self.GroupRecording.setExclusive(True)
         
+        # connect GUI
+        self.connectGUI()
         
+    def displaySignal(self):
+        """ Display signal in temporal and frequential form """
         
+        #print "[Oh yeah, I display]"
+        
+        # get the data to display
+        dataToDisplay = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
+        rate          = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate
+        
+        # display it
+        self.signalFrame.timeScope.update(dataToDisplay, rate)
+        self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
+ 
+    #
+    # -----------------------------------------------------------------
+    # 
+    # Connexion between GUI and treatment
+    #
+    # ------------------------------------------------------------------
+    #
+    def connectGUI(self):
+        print "[Connect GUI]"
+        # self.controlButtonVerticalScale
+        # self.controlButtonHorizontalScale
+        self.connect(self.controlButtonSize, Qt.SIGNAL("valueChanged(double)"), self.setSize)
+        self.connect(self.controlButtonRate, Qt.SIGNAL("valueChanged(double)"), self.setRate)
+ 
+    #
+    # ------------------------------------------------------------------
+    #
+    # GUI component behaviour
+    #
+    # ------------------------------------------------------------------
+    #
     
+    def setSize(self, newSize):
+        print "[newSize] "+str(newSize)
+        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].size = newSize
+    
+    def setRate(self, newRate):
+        print "[newRate] "+str(newRate)
+        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate = newRate
+    
+    
+        
+#
+# ==================================================================
+#
+# SIGNAL MANAGEMENT
+# Link with all the AMVU classes
+#
+# ==================================================================
+#
+def updateDisplay():
+    
+    global SCOPE
+    
+    #print "[Oh yeah, I update]"
+    
+    # test if there is a new portion of signal
+    # to display
+    if (SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].newAudio and not(SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow)) :
+        
+        # get signal and display it
+        #T = SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
+        #print "[Display signal]"
+        SCOPE.displaySignal()
+
+        # this portion of signal have been displayed        
+        SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].newAudio = False
+        
+def seeRecord():
+    
+    global SCOPE
+    
+    # stop current signal acquisition
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = True
+    
+    # display recorded signal
+    signalToDisplay = SIGNAL.getWellFormattedTimeSignal()[0]
+    print "[Display recorded signal]"
+    pg.plot(signalToDisplay) 
+
+
+def launchTrigger():
+    
+    global SCOPE
+    
+    # set the default value for the trigger
+    triggerStep = 12222
+    
+    # launch the trigger
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].startTrigger(triggerStep, 4)
+    
+def exportFile():
+    
+    global SCOPE
+    
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].exportWavFormat()
+    
+def startRecord():
+    
+    global SCOPE
+    
+    # restart current signal acquisition
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = False
+    
+    # restart signal recording
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].startRecording() # signal SR = current sound card record
+                        # at any time
+    #SR.startTrigger()
+    
+    # display continuous signal
+    timer = QtCore.QTimer()
+    timer.start(1.0)
+    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+
+#
+# ====================================================
+#
 
 def main(args):
+    
+    global SCOPE
+    
+    # signal properties
+    rate       = 8192   #44100
+    size       = 2048    #4096
 
+    # launch the graphics
     a = QApplication(args)
+    
+    # create a new signal ready to be displayed in the scope
+    SIGNAL = Signal(rate, size)
+    signalFrame = SignalFrame()
+    
+    # create the main window
+    SCOPE = MainFrame(signalFrame)
+    
+     # affect a first signal to this scope
+    SCOPE.signalFrame.consider(SIGNAL)
+    SCOPE.signalFrame.displayLastSignal() # initialize 2 plot for freq and time
+    
+    # start signal recording
+    #startRecord()
+    
+    # display continuous signal
+    timer = QtCore.QTimer()
+    timer.start(1.0)
+    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+    
 
-    f = MainFrame()
-
-    f.setTitle("AMVU")
+    # set all the graphical stuff
+    SCOPE.setTitle("AMVU")
     
     # set the toolbar
-    f.setToolBar()
+    SCOPE.setToolBar()
     
     # set the graphical elements of the interface
-##    f.resize(1400,700)
-    f.setSignalInformation()
-    f.setScopes()
-    f.setControlPanelRight()
-    f.setControlPanelLeft()
+    #f.resize(1400,700)
+    SCOPE.setSignalInformation()
+    SCOPE.setScopes()
+    SCOPE.setControlPanelRight()
+    SCOPE.setControlPanelLeft()
     
     #f.setGraphTab()
     #f.setScopes()
-    f.show()
+    SCOPE.show()
     r=a.exec_()
+    
+    # close the signal
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = True
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].stopSignalStream()
+
 
     return r
 

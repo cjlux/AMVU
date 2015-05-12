@@ -36,6 +36,8 @@ from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
 
+from scipy.fftpack import fft, fftfreq, ifft, rfft, irfft, rfftfreq
+
 
 class Signal():
     """ Signal provided by the soundcard """
@@ -136,7 +138,10 @@ class Signal():
                         isTriggerSetOff = True
                         
                         # start recording the signal
+                        # acquisition will be done at the same time for
+                        # frenquential and time signal
                         self.timeSignal.append(numpy.copy(self.signalPart))
+                        self.timeSignal.append(getFreqSignalFromTimeSignal(numpy.copy(self.signalPart)))
                         self.startRecording()
                         break
         
@@ -459,12 +464,12 @@ class Signal():
     @staticmethod
     def getFreqSignalFromTimeSignal(timeSignalToConvert):
         """ Return the frequential signal corresponding to a time signal """
-        return numpy.fft(timeSignalToConvert)
+        return abs(rfft(timeSignalToConvert))
         
     @staticmethod    
     def getTimeSignalFromFreqSignal(freqSignalToConvert):
         """ Return the time signal corresponding to a frequential signal """
-        return numpy.ifft(freqSignalToConvert)
+        return irfft(freqSignalToConvert)
     
     
     
