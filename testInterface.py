@@ -259,9 +259,8 @@ class MainFrame(QMainWindow):
         btnHelp.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnHelp)
 ##        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()')
-       
-##        
 
+        
     def ExportPDF(self):
         # Export in PDF mode
         print('ExportPDF')
@@ -414,6 +413,7 @@ class MainFrame(QMainWindow):
         
         # add the graphs to the tabs
         self.timeGraphLayout = QtGui.QGridLayout()
+##        self.timeGraphLayout.setSpacing(0)
         self.freqGraphLayout = QtGui.QGridLayout()
         
         self.timeGraphLayout.addWidget(self.timeGraph, 0, 0)
@@ -428,7 +428,15 @@ class MainFrame(QMainWindow):
         self.informationLabel1 = QtGui.QLabel(u"Amplitude : mv")
         self.informationLabel2 = QtGui.QLabel(u"Valeur crète à crète: rad/s")
         self.informationLabel3 = QtGui.QLabel(u"Temps d'enregistrement : s")
-        self.informationLabel4 = QtGui.QLabel(u"Téphasage : rad/s")
+        self.informationLabel4 = QtGui.QLabel(u"Déphasage : rad/s")
+        
+
+        # create a combobox to chose the channel to display
+        self.channelButton = Qt.QComboBox()
+        
+        self.channelButton.insertItem(0,"Channels 1+2")
+        self.channelButton.insertItem(1,"Channel 1")
+        self.channelButton.insertItem(2,"Channel 2")
         
         # add this label to the global interface
         self.signalInformationLayout = QtGui.QGridLayout()
@@ -436,7 +444,8 @@ class MainFrame(QMainWindow):
         self.signalInformationLayout.addWidget(self.informationLabel2, 1, 0)
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
-        
+        self.signalInformationLayout.addWidget(self.channelButton, 1, 1)
+
         self.signalInformation = QWidget()
         self.signalInformation.setLayout(self.signalInformationLayout)
         
@@ -497,6 +506,7 @@ class MainFrame(QMainWindow):
         
         # define the layout use to dispose the controls
         self.controlPanelLeftLayout = QtGui.QGridLayout()
+        
         
 ##        # define the layout use to dispose the text above the Filters checkbox
 ##        self.checkboxAntiNoiseLayout = QtGui.QGridLayout()
@@ -610,7 +620,11 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
 
+<<<<<<< HEAD
 ##        #set Alignment to the text QLabel
+=======
+        #set Alignment to the text QLabel
+>>>>>>> 3dd60e8578a60e92a558e9ccb513f14951fbd940
 ##        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
 ##        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
 ##        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
@@ -637,13 +651,14 @@ def main(args):
     a = QApplication(args)
 
     f = MainFrame()
-##    f.SetMenu()
+
     f.setTitle("AMVU")
     
     # set the toolbar
     f.setToolBar()
     
     # set the graphical elements of the interface
+##    f.resize(1400,700)
     f.setSignalInformation()
     f.setScopes()
     f.setControlPanelRight()
