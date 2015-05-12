@@ -401,6 +401,7 @@ class MainFrame(QMainWindow):
         
         # add the graphs to the tabs
         self.timeGraphLayout = QtGui.QGridLayout()
+##        self.timeGraphLayout.setSpacing(0)
         self.freqGraphLayout = QtGui.QGridLayout()
         
         self.timeGraphLayout.addWidget(self.timeGraph, 0, 0)
@@ -493,6 +494,7 @@ class MainFrame(QMainWindow):
         
         # define the layout use to dispose the controls
         self.controlPanelLeftLayout = QtGui.QGridLayout()
+        
         
 ##        # define the layout use to dispose the text above the Filters checkbox
 ##        self.checkboxAntiNoiseLayout = QtGui.QGridLayout()
@@ -605,10 +607,10 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2Sensibility, 15, 1)
 
         #set Alignment to the text QLabel
-        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
-        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
-        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
-        self.InputBoxOffsetText.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxOffsetText.setAlignment(QtCore.Qt.AlignRight)
         
         
         # add all this stuff to the global interface
