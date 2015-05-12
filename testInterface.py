@@ -16,7 +16,7 @@ class MainFrame(QMainWindow):
         
         QMainWindow.__init__(self)
 
-        self.resize(1100,700)
+       
 
       
         #know the size of the main frame
@@ -186,6 +186,7 @@ class MainFrame(QMainWindow):
         self.signalGraph = QTabWidget(self) 
         
         self.signalGraph.addTab(self.timeGraphTab,"Time")
+        
         self.signalGraph.addTab(self.freqGraphTab,"Freq")
         
         # add the graph tab to the global interface
@@ -620,11 +621,18 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
 
-<<<<<<< HEAD
+        # create the frames aroud the checkboxs
+       
+
+        # add the frame around the ckeckboxs
+        
+    
+
+
 ##        #set Alignment to the text QLabel
-=======
+
         #set Alignment to the text QLabel
->>>>>>> 3dd60e8578a60e92a558e9ccb513f14951fbd940
+
 ##        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
 ##        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
 ##        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
