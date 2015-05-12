@@ -67,18 +67,6 @@ class Signal():
         # <=> represent all the signal
         self.signalParts = []
         
-    #
-    # Unused getters ---
-    #
-        
-#    def getNewAudioStatus(self):
-#        return self.newAudio
-    
-#    def setNewAudioStatus(self, status):
-#        self.newAudio = status
-    
-    # ------------------
-        
     def getStream(self):
         """ Return the stream used for the current signal """
         return self.stream
