@@ -15,7 +15,16 @@ class MainFrame(QMainWindow):
     def __init__(self):
         
         QMainWindow.__init__(self)
-        
+
+        self.resize(1100,700)
+
+      
+        #know the size of the main frame
+        size_fenetre = self.geometry()
+        size_fenetre = size_fenetre.getCoords()
+        width_fenetre = size_fenetre[2]
+        height_fenetre = size_fenetre[3]
+          
         # tabs
         self.timeGraphTab = None
         self.freqGraphTab = None
@@ -159,6 +168,9 @@ class MainFrame(QMainWindow):
         self.globalInterface.setLayout(self.globalInterfaceLayout)
         
         self.setCentralWidget(self.globalInterface)
+
+        #change size
+        self.globalInterfaceCenter.setFixedSize(0.25*width_fenetre,700)
 
 
     def setTitle(self, titre="") :
@@ -339,34 +351,34 @@ class MainFrame(QMainWindow):
     # countries, but nevermind... ).
     #
     
-    def setControl1(self):
-        # set the controls for the first tab
-        
-        # set a layout to clearly dispose all the buttons
-        self.layoutControls1 = QtGui.QGridLayout()
-        
-        # create all the control buttons
-        self.controlButton11 = QtGui.QPushButton("Button 1 tab 1")
-        self.controlButton12 = QtGui.QPushButton("Button 2 tab 1")
-             
-        # add this buttons to the layout
-        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
-        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
-                
-        # add this layout to the controls widget
-        self.controlWidget1 = QtGui.QWidget()
-        self.controlWidget1.setLayout(self.layoutControls1)
-
-        # create all the knob buttons
-        self.knobButton11 = Qwt.QwtKnob()
-        
-        self.knobButton12 = Qwt.QwtKnob()
-        self.knobButton11.setTotalAngle(270)
-
-        # add this knobs to the layout
-        
-        self.layoutControls1.addWidget(self.knobButton11, 0, 1)
-        self.layoutControls1.addWidget(self.knobButton12, 1, 1)
+####    def setControl1(self):
+####        # set the controls for the first tab
+####        
+####        # set a layout to clearly dispose all the buttons
+####        self.layoutControls1 = QtGui.QGridLayout()
+####        
+####        # create all the control buttons
+####        self.controlButton11 = QtGui.QPushButton("Button 1 tab 1")
+####        self.controlButton12 = QtGui.QPushButton("Button 2 tab 1")
+####             
+####        # add this buttons to the layout
+####        self.layoutControls1.addWidget(self.controlButton11, 0, 0)
+####        self.layoutControls1.addWidget(self.controlButton12, 1, 0)
+####                
+####        # add this layout to the controls widget
+####        self.controlWidget1 = QtGui.QWidget()
+####        self.controlWidget1.setLayout(self.layoutControls1)
+####
+####        # create all the knob buttons
+####        self.knobButton11 = Qwt.QwtKnob()
+####        
+####        self.knobButton12 = Qwt.QwtKnob()
+####        self.knobButton11.setTotalAngle(270)
+####
+####        # add this knobs to the layout
+####        
+####        self.layoutControls1.addWidget(self.knobButton11, 0, 1)
+####        self.layoutControls1.addWidget(self.knobButton12, 1, 1)
          
     def setControl2(self):
         # set the controls for the second tab
@@ -559,6 +571,8 @@ class MainFrame(QMainWindow):
         self.checkboxHP.setToolTip('Activate the High Pass filter')
         self.checkboxBP.setToolTip('Activate the Band Pass filter')
         self.checkboxCut.setToolTip('Activate the Band Cut filter')
+
+        
         
 
         #add text to all the buttons
@@ -585,7 +599,7 @@ class MainFrame(QMainWindow):
         self.InputBoxThresholdText = QtGui.QLabel("Threshold")
         self.InputBoxOffsetText = QtGui.QLabel("Offset")
         self.InputBoxChanel1SensibilityText = QtGui.QLabel("Chanel 1 Sensibility")
-        self.InputBoxChanel2Sensibility = QtGui.QLabel("Chanel 2 Sensibility")
+        self.InputBoxChanel2SensibilityText = QtGui.QLabel("Chanel 2 Sensibility")       
         
 
         #add the text and the checkbox on each layout
@@ -594,13 +608,13 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 12, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxOffsetText, 13, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2Sensibility, 15, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
 
-        #set Alignment to the text QLabel
-        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
-        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
-        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
-        self.InputBoxOffsetText.setAlignment(QtCore.Qt.AlignRight)
+##        #set Alignment to the text QLabel
+##        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxFrequency2Text.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxThresholdText.setAlignment(QtCore.Qt.AlignRight)
+##        self.InputBoxOffsetText.setAlignment(QtCore.Qt.AlignRight)
         
         
         # add all this stuff to the global interface
@@ -609,10 +623,11 @@ class MainFrame(QMainWindow):
         
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
 
-        #resize the width of the Widget
-        self.controlPanelLeft.setMaximumWidth(213)
-
-        #move the left panel closer to the right one
+       #put margins around the widget
+        self.controlPanelLeft.setContentsMargins( 0, 100, 0, 0)
+##
+##        #resize the width of the Widget
+##        self.controlPanelLeft.setMaximumWidth(213)
 
         
     
