@@ -539,7 +539,6 @@ class Signal():
             # this portion of signal is new and doesn't have been displayed
             # to the user
             self.newAudio=True
-    
 
     #def continuousStart(self):
     #    """ CALL THIS to start running forever."""
@@ -551,6 +550,21 @@ class Signal():
     #    self.threadsDieNow=True
 
     # ------------------------------------------------------
+    
+    def startRealTimeDisplay(self, time=None):
+        """
+        Actualize the signal buffer with currently received
+        sound card signal.
+        Used for real time diplay of the signal
+        """
+        self.realTimeDisplayProcess = Thread(target=self.__recordSignalPart)
+        self.realTimeDisplayProcess.start()
+        
+        # if time given, stop recording when time is reached
+        if time!=None :
+            t.sleep(time)
+            self.stopRecording()
+            
 
     
     

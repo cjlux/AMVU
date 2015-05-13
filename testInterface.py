@@ -617,11 +617,21 @@ class MainFrame(QMainWindow):
     
     def setSize(self, newSize):
         print "[newSize] "+str(newSize)
-        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].size = newSize
+        
+        # replace the current by a new signal using the new size
+        rate    = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate
+        channel = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].channel
+        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal] = Signal(rate, newSize, channel)
+        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].actualizeSignalPart()
     
     def setRate(self, newRate):
         print "[newRate] "+str(newRate)
-        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate = newRate
+        
+        # replace the current by a new signal using the new size
+        size    = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].size
+        channel = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].channel
+        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal] = Signal(newRate, size, channel)
+        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].actualizeSignalPart()
     
     
         
@@ -696,6 +706,24 @@ def startRecord():
     timer = QtCore.QTimer()
     timer.start(1.0)
     SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+    
+def startRealTimeSignalDisplay():
+    
+    global SCOPE
+    
+    # restart current signal acquisition
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = False
+    
+    # restart signal recording
+    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].startRealTimeDisplay()
+    # at any time
+    #SR.startTrigger()
+    
+    # display continuous signal
+    timer = QtCore.QTimer()
+    timer.start(1.0)
+    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+
 
 #
 # ====================================================
@@ -725,6 +753,9 @@ def main(args):
     
     # start signal recording
     #startRecord()
+    
+    # start real time signal acquisition
+    startRealTimeSignalDisplay()
     
     # display continuous signal
     timer = QtCore.QTimer()
