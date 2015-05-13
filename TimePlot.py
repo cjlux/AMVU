@@ -24,10 +24,11 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.1
-# Last update : 06/05/2015
+# Version 0.4
+# Last update : 13/05/2015
 
 from Plot import Plot
+from PyQt4 import Qwt5 as Qwt
 
 class TimePlot(Plot):
     
@@ -35,9 +36,20 @@ class TimePlot(Plot):
         Plot.__init__(self, dataToDisplay, rate)
         self.df = df
         self.fr = fr
+        
+        self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
     
     
     #def __init__(self, a1, a2, dt, df=0, fr=0):
     #    Plot.__init__(self, a1, a2, dt)
     #    self.df = df
     #    self.fr = fr
+    
+    def setVerticalScale(self, minMaxValue):
+        self.setAxisScale (Qwt.QwtPlot.yLeft, -minMaxValue, minMaxValue, 0)
+        self.setAxisScale (Qwt.QwtPlot.yRight, -minMaxValue, minMaxValue, 0) 	
+        self.updateAxes()
+    
+    def setHorizontalScale(self, maxValue):
+        self.setAxisScale (Qwt.QwtPlot.xBottom, 0, maxValue, 0)
+        self.updateAxes()

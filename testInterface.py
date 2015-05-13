@@ -15,6 +15,8 @@ import pyqtgraph as pg
 from Signal import Signal
 from SignalFrame import SignalFrame
 
+# Last update : S122, 13/05/2015
+
 #
 # Global values
 #
@@ -209,15 +211,15 @@ class MainFrame(QMainWindow):
     def setGraphTab(self):
         
         # set each graph tab
-        self.timeGraphTab = QWidget() 
-        self.freqGraphTab = QWidget()
+        self.timeGraphTab   = QWidget() 
+        self.freqGraphTab   = QWidget()
+        self.recordedSignal = QWidget()
 
         # set the tab widget hosting each graph tab
         self.signalGraph = QTabWidget(self) 
-        
         self.signalGraph.addTab(self.timeGraphTab,"Time")
-        
         self.signalGraph.addTab(self.freqGraphTab,"Freq")
+        self.signalGraph.addTab(self.recordedSignal,"Recorded signal")
         
         # add the graph tab to the global interface
         self.globalInterfaceLeftLayout.addWidget(self.signalGraph, 1, 0)
@@ -237,7 +239,7 @@ class MainFrame(QMainWindow):
         btnQuit.setCheckable(True)
         btnQuit.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnQuit)
-        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()'))
+        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),self.closeMainFrame)
 
         btnSave = Qt.QToolButton(toolBar)
         btnSave.setToolTip('Save in .wav')
@@ -289,8 +291,6 @@ class MainFrame(QMainWindow):
         btnHelp.setCheckable(False)
         btnHelp.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnHelp)
-##        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()')
-
         
     def ExportPDF(self):
         # Export in PDF mode
@@ -301,8 +301,9 @@ class MainFrame(QMainWindow):
         print('ExportPNG')
       
     
+    
     #
-    # ORGANIZE EACH TAB ---------------------------------------------
+    # ORGANIZE EACH GUI ELEMENT -----------------------------------------
     #
 
     def setScopes(self):
@@ -323,6 +324,9 @@ class MainFrame(QMainWindow):
         
         self.timeGraphTab.setLayout(self.timeGraphLayout)
         self.freqGraphTab.setLayout(self.freqGraphLayout)
+
+    def setRecordedSignalDisplay(self):
+        self.recordedSignal = pg.PlotWidget()
 
     def setSignalInformation(self):
         
@@ -359,24 +363,32 @@ class MainFrame(QMainWindow):
         self.controlPanelRightLayout = QtGui.QGridLayout()
         
         # set all the controls and add them to the layout
+        
+        # scales controls
         self.controlButtonVerticalScale = Qwt.QwtKnob()
         self.controlButtonVerticalScale.setTotalAngle(270)
         self.controlButtonHorizontalScale = Qwt.QwtKnob()
         self.controlButtonHorizontalScale.setTotalAngle(270)
         
+        # set propreties for this controls
+        self.controlButtonVerticalScale.setScale(0, 1, 0.2)
+        self.controlButtonVerticalScale.setRange(0, 1)
+        self.controlButtonHorizontalScale.setScale(0, 0.5, 0.1)
+        self.controlButtonHorizontalScale.setRange(0, 0.5)
+        
+        # signal size and rate controls
         self.controlButtonSize = Qwt.QwtKnob()
         self.controlButtonSize.setTotalAngle(270)
         self.controlButtonRate = Qwt.QwtKnob()
         self.controlButtonRate.setTotalAngle(270)
         
-        #rate       = 8192   #44100
-        #size       = 2048    #4096
-        
-        self.controlButtonSize.setScale(512, 4096, 512)
-        self.controlButtonSize.setRange(512, 4096)
-        self.controlButtonRate.setScale(8192, 44100, 4096)
+        # set properties for this controls
+        self.controlButtonSize.setScale(1024, 4096, 512)
+        self.controlButtonSize.setRange(1024, 4096)
+        self.controlButtonRate.setScale(8192, 44100, 8192)
         self.controlButtonRate.setRange(8192, 44100)
-##        
+
+        # disposition on the layout
         self.controlPanelRightLayout.addWidget(self.controlButtonVerticalScale, 0, 0)
         self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale, 2, 0)
         self.controlPanelRightLayout.addWidget(self.controlButtonSize, 4, 0)
@@ -404,7 +416,6 @@ class MainFrame(QMainWindow):
         self.controlPanelRightLayout.addWidget(self.button3Text, 5, 0)
         self.controlPanelRightLayout.addWidget(self.button4Text, 7, 0)   
            
-        
         # add all this stuff to the global interface
         
         self.controlPanelRight = QWidget()
@@ -586,8 +597,8 @@ class MainFrame(QMainWindow):
         #print "[Oh yeah, I display]"
         
         # get the data to display
-        dataToDisplay = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
-        rate          = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate
+        dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLastSignalRecordedPart()
+        rate          = self.signalFrame.signalList[self.signalFrame.currentSignal].rate
         
         # display it
         self.signalFrame.timeScope.update(dataToDisplay, rate)
@@ -606,6 +617,8 @@ class MainFrame(QMainWindow):
         # self.controlButtonHorizontalScale
         self.connect(self.controlButtonSize, Qt.SIGNAL("valueChanged(double)"), self.setSize)
         self.connect(self.controlButtonRate, Qt.SIGNAL("valueChanged(double)"), self.setRate)
+        self.connect(self.controlButtonVerticalScale, Qt.SIGNAL("valueChanged(double)"), self.setVerticalScale)
+        self.connect(self.controlButtonHorizontalScale, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
  
     #
     # ------------------------------------------------------------------
@@ -615,119 +628,137 @@ class MainFrame(QMainWindow):
     # ------------------------------------------------------------------
     #
     
+    def __deleteCurrentSignal(self):
+        self.signalFrame.deleteCurrentSignal()
+    
     def setSize(self, newSize):
         print "[newSize] "+str(newSize)
         
+        # destroy the current signal
+        self.__deleteCurrentSignal()
+        
         # replace the current by a new signal using the new size
-        rate    = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].rate
-        channel = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].channel
-        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal] = Signal(rate, newSize, channel)
-        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].actualizeSignalPart()
+        rate    = self.signalFrame.getCurrentSignal().rate
+        channel = self.signalFrame.getCurrentSignal().channel
+        format  = self.signalFrame.getCurrentSignal().format
+        self.signalFrame.setCurrentSignal(Signal(rate, int(newSize), format, channel))
+        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
     
     def setRate(self, newRate):
         print "[newRate] "+str(newRate)
         
+        # stop the current signal acquisition
+        self.__deleteCurrentSignal()
+        
         # replace the current by a new signal using the new size
-        size    = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].size
-        channel = self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].channel
-        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal] = Signal(newRate, size, channel)
-        self.signalFrame.signalList[SCOPE.signalFrame.currentSignal].actualizeSignalPart()
+        size    = self.signalFrame.getCurrentSignal().size
+        channel = self.signalFrame.getCurrentSignal().channel
+        format  = self.signalFrame.getCurrentSignal().format
+        self.signalFrame.setCurrentSignal(Signal(int(newRate), size, format, channel))
+        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
     
+    def setVerticalScale(self, newVerticalScale):
+        print "[Vertical Scale] "+str(newVerticalScale)
+        self.signalFrame.getFreqScope().setVerticalScale(newVerticalScale)
+        self.signalFrame.getTimeScope().setVerticalScale(newVerticalScale)
     
+    def setHorizontalScale(self, newHorizontalScale):
+        print "[Horizontal Scale] "+str(newHorizontalScale)
+        self.signalFrame.getFreqScope().setHorizontalScale(newHorizontalScale)
+        self.signalFrame.getTimeScope().setHorizontalScale(newHorizontalScale)
+    
+    def closeMainFrame(self):
+        self.signalFrame.deleteAllSignal()
+        self.close()
+    
+    #
+    # ==================================================================
+    #
+    # SIGNAL MANAGEMENT
+    # Link with all the AMVU classes
+    #
+    # ==================================================================
+    #
+    def updateDisplay(self):
         
-#
-# ==================================================================
-#
-# SIGNAL MANAGEMENT
-# Link with all the AMVU classes
-#
-# ==================================================================
-#
-def updateDisplay():
-    
-    global SCOPE
-    
-    #print "[Oh yeah, I update]"
-    
-    # test if there is a new portion of signal
-    # to display
-    if (SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].newAudio and not(SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow)) :
+        print "[Oh yeah, I update]"
         
-        # get signal and display it
-        #T = SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
-        #print "[Display signal]"
-        SCOPE.displaySignal()
-
-        # this portion of signal have been displayed        
-        SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].newAudio = False
+        # test if there is a new portion of signal
+        # to display
+        if (self.signalFrame.getCurrentSignal().newAudio and not(self.signalFrame.getCurrentSignal().threadsDieNow)) :
+            
+            # get signal and display it
+            #T = SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].getLastSignalRecordedPart()
+            #print "[Display signal]"
+            self.displaySignal()
+    
+            # this portion of signal have been displayed        
+            self.signalFrame.getCurrentSignal().newAudio = False
         
-def seeRecord():
+    def seeRecord(self):
+        
+        # stop current signal acquisition
+        self.signalFrame.getCurrentSignal().threadsDieNow = True
+        
+        # display recorded signal
+        signalToDisplay = self.signalFrame.getCurrentSignal().getWellFormattedTimeSignal()[0]
+        print "[Display recorded signal]"
+        pg.plot(signalToDisplay) 
+
+    def launchTrigger(self):
+        
+        # set the default value for the trigger
+        triggerStep = 12222
+        
+        # launch the trigger
+        self.signalFrame.getCurrentSignal().startTrigger(triggerStep, 4)
     
-    global SCOPE
+    def exportFile(self):
+        
+        self.signalFrame.getCurrentSignal().exportWavFormat()
     
-    # stop current signal acquisition
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = True
     
-    # display recorded signal
-    signalToDisplay = SIGNAL.getWellFormattedTimeSignal()[0]
-    print "[Display recorded signal]"
-    pg.plot(signalToDisplay) 
+    
 
 
-def launchTrigger():
-    
-    global SCOPE
-    
-    # set the default value for the trigger
-    triggerStep = 12222
-    
-    # launch the trigger
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].startTrigger(triggerStep, 4)
-    
-def exportFile():
-    
-    global SCOPE
-    
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].exportWavFormat()
-    
-def startRecord():
-    
-    global SCOPE
+#
+# ====================================================
+#
+
+def startRealTimeSignalDisplay():
     
     # restart current signal acquisition
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = False
+    SCOPE.signalFrame.getCurrentSignal().threadsDieNow = False
     
     # restart signal recording
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].startRecording() # signal SR = current sound card record
+    SCOPE.signalFrame.getCurrentSignal().startRealTimeDisplay()
+    # at any time
+    #SR.startTrigger()
+    
+    print "[Start RTSD]"
+    
+    # display continuous signal
+    timer = QtCore.QTimer()
+    timer.start(1.0)
+    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), SCOPE.updateDisplay)
+
+def startRecord():
+    
+    # restart current signal acquisition
+    SCOPE.signalFrame.getCurrentSignal().threadsDieNow = False
+    
+    # restart signal recording
+    SCOPE.signalFrame.getCurrentSignal().startRecording() # signal SR = current sound card record
                         # at any time
     #SR.startTrigger()
     
     # display continuous signal
     timer = QtCore.QTimer()
     timer.start(1.0)
-    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
-    
-def startRealTimeSignalDisplay():
-    
-    global SCOPE
-    
-    # restart current signal acquisition
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = False
-    
-    # restart signal recording
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].startRealTimeDisplay()
-    # at any time
-    #SR.startTrigger()
-    
-    # display continuous signal
-    timer = QtCore.QTimer()
-    timer.start(1.0)
-    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), SCOPE.updateDisplay)
 
-
-#
-# ====================================================
-#
+def stopRecording():
+    SCOPE.signalFrame.getCurrentSignal().stopRecording()
 
 def main(args):
     
@@ -760,7 +791,7 @@ def main(args):
     # display continuous signal
     timer = QtCore.QTimer()
     timer.start(1.0)
-    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), updateDisplay)
+    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), SCOPE.updateDisplay)
     
 
     # set all the graphical stuff
@@ -773,6 +804,7 @@ def main(args):
     #f.resize(1400,700)
     SCOPE.setSignalInformation()
     SCOPE.setScopes()
+    SCOPE.setRecordedSignalDisplay()
     SCOPE.setControlPanelRight()
     SCOPE.setControlPanelLeft()
     
@@ -782,9 +814,7 @@ def main(args):
     r=a.exec_()
     
     # close the signal
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].threadsDieNow = True
-    SCOPE.signalFrame.signalList[SCOPE.signalFrame.currentSignal].stopSignalStream()
-
+    SCOPE.closeMainFrame()
 
     return r
 

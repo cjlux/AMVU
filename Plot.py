@@ -24,8 +24,8 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.1
-# Last update : 05/05/2015
+# Version 0.4
+# Last update : 13/05/2015
 
 import pyqtgraph as pg
 import numpy as np
@@ -73,7 +73,6 @@ class Plot(Qwt.QwtPlot):
         
         # define axes
         self.enableAxis(Qwt.QwtPlot.yRight);
-        self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time [s]');
         self.setAxisTitle(Qwt.QwtPlot.yLeft,  'Amplitude Chan. 1 [V]');
         self.setAxisTitle(Qwt.QwtPlot.yRight, 'Amplitude Chan. 2 [V]');
           
@@ -81,10 +80,15 @@ class Plot(Qwt.QwtPlot):
         self.setAxisMaxMinor(Qwt.QwtPlot.xBottom, 0);
 
         self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine());
+        self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine());
         self.setAxisMaxMajor(Qwt.QwtPlot.yLeft, 10);
         self.setAxisMaxMinor(Qwt.QwtPlot.yLeft, 0);
         self.setAxisMaxMajor(Qwt.QwtPlot.yRight, 10);
         self.setAxisMaxMinor(Qwt.QwtPlot.yRight, 0);
+        
+        # set scale
+        self.setVerticalScale(0.5)
+        # horizontal scale stay in autoscale
         
         # curves for scope traces
         self.curve2 = Qwt.QwtPlotCurve('Trace2')
@@ -115,6 +119,8 @@ class Plot(Qwt.QwtPlot):
         
         self.replot()
         
+    
+        
     def setOffset(self, newOffset):
         self.offset = newOffset
         
@@ -127,17 +133,17 @@ class Plot(Qwt.QwtPlot):
         self.dt = 1./rate
         self.ti = np.arange(0.0, 1.0, self.dt)
         
-        print "----------------------"
+        #print "----------------------"
         #print dataToDisplay
-        print self.a1
-        print self.a2
+        #print self.a1
+        #print self.a2
         
         l=len(self.a1)
         self.curve1.setData([0.0,0.0], [0.0,0.0])
         self.curve2.setData(self.ti[0:l], self.a2[:l])
         self.replot()
         
-        print "[Oh yeah, I update]"
+        #print "[Oh yeah, I update]"
     
     
         

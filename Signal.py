@@ -24,8 +24,8 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.8
-# Last update : 05/05/2015
+# Version 0.9
+# Last update : 13/05/2015
 
 import pyaudio
 import numpy
@@ -48,6 +48,8 @@ class Signal():
         /!\ All the attributes are public for the moment
         If you want to access them without setters or getters, be careful
         """
+        
+        print "[New signal] Size "+str(size)+", rate "+str(rate)
         
         # state of recording
         self.threadsDieNow  = False
@@ -180,7 +182,21 @@ class Signal():
     
     def stopRecording(self):
         """ Stop any recording currently running """
-        self.threadsDieNow=True
+        self.threadsDieNow = True
+    
+    def stopDisplaying(self):
+        """ Stop any displaying currently running """
+        self.threadsDieNow = True
+        
+    def deleteSignal(self):
+        """
+        Delete the link of the current signal object with the sound card
+        """
+        self.threadsDieNow = True
+        
+        self.stopSignalStream()
+        #self.closeSignalStream()
+    
         
     def getLastSignalRecordedPart(self):
         """
@@ -419,9 +435,10 @@ class Signal():
         """ Stop the stream used for the current signal """
         self.soundCardStream.stop_stream()
         
-    def closeSignalStream(self):
-        """ Close the stream used for the current signal """
-        self.soundCardStream.close_signal()
+    # Not usefull with pyaudio ?
+    #def closeSignalStream(self):
+    #    """ Close the stream used for the current signal """
+    #    self.soundCardStream.close_stream()
 
     def getSignalInfo(self):
         """ Give some information about the signal """
@@ -529,6 +546,8 @@ class Signal():
             
     def __recordSignalPart(self):
         """ Record only parts of signal """
+        
+        print "[Record Signal Part]"
         
         # daemon recording as fast as it can the data from the sound card
         while not(self.threadsDieNow):

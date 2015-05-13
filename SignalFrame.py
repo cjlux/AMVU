@@ -24,8 +24,8 @@ from __future__ import division
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Version 0.1
-# Last update : 06/05/2015
+# Version 0.4
+# Last update : 13/05/2015
 
 from Signal import Signal
 from TimePlot import TimePlot
@@ -54,6 +54,21 @@ class SignalFrame():
         """
         self.signalList.append(signal)
         
+    def deleteCurrentSignal(self):
+        """
+        Delete the current signal from the storage and
+        select the previous signal. If there isn't any
+        previous signal, currentSignal stay to 0.
+        """
+        self.signalList[self.currentSignal].deleteSignal()
+        if (self.currentSignal>0):
+            self.currentSignal -= 1
+    
+    def deleteAllSignal(self):
+        for i in range(len(self.signalList)):
+            self.signalList[i].deleteSignal()
+        self.currentSignal = 0    
+    
     def getFreqScope(self):
         """ Return the frequential scope for the current signal """
         return self.freqScope
@@ -62,6 +77,14 @@ class SignalFrame():
         """ Return the time scope for the current signal """
         return self.timeScope
     
+    def getCurrentSignal(self):
+        """ Return the current signal """
+        return self.signalList[self.currentSignal]
+    
+    def setCurrentSignal(self, newSignal):
+        """ Change the current signal """
+        self.signalList[self.currentSignal] = newSignal
+        
     def displayPreviousSignal(self):
         """
         Select the previous signal in the signal list
