@@ -134,10 +134,10 @@ class MainFrame(QMainWindow):
         # for tab 1
 #<<<<<<< Updated upstream
 #>>>>>>> Stashed changes
-        self.checkboxStartRecording = None
-        self.checkboxStartNsec = None
-        self.checkboxStopRecording = None
-        self.checkboxTrigger = None
+        self.StartRecording = None
+        self.StartNsec = None
+        self.StopRecording = None
+        self.Trigger = None
         self.checkboxOffset = None
         self.checkboxAntiNoise = None
         self.checkboxDerivate = None
@@ -336,13 +336,6 @@ class MainFrame(QMainWindow):
         self.informationLabel3 = QtGui.QLabel(u"Temps d'enregistrement : s")
         self.informationLabel4 = QtGui.QLabel(u"Déphasage : rad/s")
         
-
-        # create a combobox to chose the channel to display
-        self.channelButton = Qt.QComboBox()
-        
-        self.channelButton.insertItem(0,"Channels 1+2")
-        self.channelButton.insertItem(1,"Channel 1")
-        self.channelButton.insertItem(2,"Channel 2")
         
         # add this label to the global interface
         self.signalInformationLayout = QtGui.QGridLayout()
@@ -350,8 +343,7 @@ class MainFrame(QMainWindow):
         self.signalInformationLayout.addWidget(self.informationLabel2, 1, 0)
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
-        self.signalInformationLayout.addWidget(self.channelButton, 1, 1)
-
+        
         self.signalInformation = QWidget()
         self.signalInformation.setLayout(self.signalInformationLayout)
         
@@ -426,34 +418,30 @@ class MainFrame(QMainWindow):
         
         # define the layout use to dispose the controls
         self.controlPanelLeftLayout = QtGui.QGridLayout()
-        
-        
-####        # define the layout use to dispose the text above the Filters checkbox
-####        self.checkboxAntiNoiseLayout = QtGui.QGridLayout()
-####        self.checkboxLPLayout = QtGui.QGridLayout()
-####        self.checkboxHPLayout = QtGui.QGridLayout()
-####        self.checkboxBPLayout = QtGui.QGridLayout()
-####        self.checkboxCutLayout =QtGui.QGridLayout()
+                
+        # set all the controls
 
+         # create a combobox to chose the channel to display
+        self.channelButton = Qt.QComboBox()
         
-        # set all the controls       
+        self.channelButton.insertItem(0,"Channels 1+2")
+        self.channelButton.insertItem(1,"Channel 1")
+        self.channelButton.insertItem(2,"Channel 2")
         
-        # S122 : i think it's better for the main control to be buttons
-        #        they are the control the user use the most, they have
-        #        to be wide and different from the others controls
-        self.checkboxStartRecording = QtGui.QPushButton("Start",self)
-        self.checkboxStopRecording = QtGui.QCheckBox("Stop",self)
-        # ---------------------------------------------------------------
         
-        self.checkboxStartNsec = QtGui.QPushButton("",self)
+        self.StartRecording = QtGui.QPushButton("Start",self)
+        self.StartNsec = QtGui.QPushButton("",self)
+        self.StopRecording = QtGui.QPushButton("Stop",self)        
+        self.Trigger = QtGui.QPushButton("",self)
         
-        self.checkboxTrigger = QtGui.QCheckBox("",self)        
         self.checkboxOffset = QtGui.QCheckBox("",self)
         
         self.checkboxDerivate = QtGui.QCheckBox("",self)
         self.checkboxIntegrate = QtGui.QCheckBox("",self)
 
         self.checkboxAntiNoise = QtGui.QCheckBox("",self)
+        self.sliderAntiNoise = QtGui.QSlider(self)
+                
         self.checkboxLP = QtGui.QCheckBox("",self)
         self.checkboxHP = QtGui.QCheckBox("",self)
         self.checkboxBP = QtGui.QCheckBox("",self)
@@ -466,55 +454,76 @@ class MainFrame(QMainWindow):
         self.InputBoxOffset = QtGui.QLineEdit(self)
         self.InputBoxChanel1Sensibility = QtGui.QLineEdit(self)
         self.InputBoxChanel2Sensibility = QtGui.QLineEdit(self)
-        
 
-        # add all the controls to the layout        
-        self.controlPanelLeftLayout.addWidget(self.checkboxStartRecording, 0, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxStartNsec, 1, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxStopRecording, 2, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxTrigger, 3, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 4, 0)
+        #create label with the text of the inputbox as a Widget to be put in the grid above the checkbox
+        self.EmptyText = QtGui.QLabel(" ")
+        self.InputBoxNSecondText = QtGui.QLabel("sec")
+        self.InputBoxThresholdText = QtGui.QLabel("Threshold")
+        self.InputBoxFrequency1Text = QtGui.QLabel("Frequency 1")
+        self.InputBoxFrequency2Text = QtGui.QLabel("Frequency 2")
+        self.InputBoxOffsetText = QtGui.QLabel("Offset")
+        self.InputBoxChanel1SensibilityText = QtGui.QLabel("Channel 1 Sensibility")
+        self.InputBoxChanel2SensibilityText = QtGui.QLabel("Channel 2 Sensibility")       
+               
 
-        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 5, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 5, 1)
-
-        self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 7, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxLP, 8, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxHP, 8, 1)
-        self.controlPanelLeftLayout.addWidget(self.checkboxBP, 9, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxCut, 9, 1)
-
-        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 1, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1, 10, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2, 11, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 12, 1)
+        # add all the controls and text to the layout
+        self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)
+        self.controlPanelLeftLayout.addWidget(self.EmptyText, 1, 0)
+        self.controlPanelLeftLayout.addWidget(self.StartRecording, 2, 0)
+        self.controlPanelLeftLayout.addWidget(self.StartNsec, 3, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 3, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecondText, 3, 2)
+        self.controlPanelLeftLayout.addWidget(self.StopRecording, 4, 0)
+        self.controlPanelLeftLayout.addWidget(self.Trigger, 5, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 5, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 5, 2)        
+        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 6, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 7, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 8, 0)
+        self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 8, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxLP, 9, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxHP, 9, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxBP, 10, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxCut, 10, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1Text, 11, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1, 11, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2Text, 12, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2, 12, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxOffsetText, 13, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 13, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1Sensibility, 14, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2Sensibility, 15, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
         
 
         # add tooltips on each button
-        self.checkboxStartRecording.setToolTip('Start recording the measure')
-        self.checkboxStartNsec.setToolTip('Start recording the measure for a number of seconds specified. The record will automatically stop itself')
-        self.checkboxStopRecording.setToolTip('Stop recording the measure')
-        self.checkboxTrigger.setToolTip('Use the mode Trigger to automatically start recording for a threshold specified')
+        self.channelButton.setToolTip('Choose the channel to be displayed')
+        self.StartRecording.setToolTip('Start recording the measure')
+        self.StartNsec.setToolTip('Start recording the measure for a number of seconds specified. The record will automatically stop itself')
+        self.StopRecording.setToolTip('Stop recording the measure')
+        self.Trigger.setToolTip('Use the mode Trigger to automatically start recording for the threshold specified')
         self.checkboxOffset.setToolTip('Add an offset to the measure ')
      
         self.checkboxDerivate.setToolTip('Derivate the signal')
         self.checkboxIntegrate.setToolTip('Integrate the signal')
 
-        self.checkboxAntiNoise.setToolTip('Activate the antinoise filter')
+        self.checkboxAntiNoise.setToolTip('Activate the AntiNoise filter')
         self.checkboxLP.setToolTip('Activate the Low Pass filter')
         self.checkboxHP.setToolTip('Activate the High Pass filter')
         self.checkboxBP.setToolTip('Activate the Band Pass filter')
-        self.checkboxCut.setToolTip('Activate the Band Cut filter')      
+        self.checkboxCut.setToolTip('Activate the Band Cut filter')
+        self.InputBoxFrequency1.setToolTip('Principal frequency used by the Low Noise filter and the High Pass filter')
+        self.InputBoxFrequency2.setToolTip('secondary frequency used by the Band Pass filter and the Band Cut filter')
+        
         
 
         #add text to all the buttons
-        self.checkboxStartRecording.setText('Start Recording')
-        self.checkboxStartNsec.setText('Start for N sec')
-        self.checkboxStopRecording.setText('Stop Recording')
-        self.checkboxTrigger.setText('Trigger')
+        self.StartRecording.setText('Start Recording')
+        self.StartNsec.setText('Start for')
+        self.StopRecording.setText('Stop Recording')
+        self.Trigger.setText('Trigger')
         self.checkboxOffset.setText('Offset')
 
         self.checkboxDerivate.setText('Derivate')
@@ -527,35 +536,6 @@ class MainFrame(QMainWindow):
         self.checkboxCut.setText('Band Cut Filter')
 
 
-        #create label with the text of the inputbox as a Widget to be put in the grid above the checkbox
-        self.InputBoxNSecondText = QtGui.QLabel("")
-        self.InputBoxFrequency1Text = QtGui.QLabel("Frequency 1")
-        self.InputBoxFrequency2Text = QtGui.QLabel("Frequency 2")
-        self.InputBoxThresholdText = QtGui.QLabel("Threshold")
-        self.InputBoxOffsetText = QtGui.QLabel("Offset")
-        self.InputBoxChanel1SensibilityText = QtGui.QLabel("Chanel 1 Sensibility")
-        self.InputBoxChanel2SensibilityText = QtGui.QLabel("Chanel 2 Sensibility")       
-        
-
-        #add the text and the checkbox on each layout
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1Text, 10, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2Text, 11, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 12, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxOffsetText, 13, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2SensibilityText, 15, 1)
-#<<<<<<< HEAD
-
-        # create the frames aroud the checkboxs
-       
-
-        # add the frame around the ckeckboxs
-        
-    
-
-
-##        #set Alignment to the text QLabel
-
         #set Alignment to the text QLabel
 
 ##        self.InputBoxFrequency1Text.setAlignment(QtCore.Qt.AlignRight)
@@ -565,7 +545,7 @@ class MainFrame(QMainWindow):
         
 #=======
     
-#>>>>>>> 2fa4b70b82c65a2ac6ef41b160a3d131f1f52808
+
         
         # add all this stuff to the global interface
         self.controlPanelLeft = QWidget()
@@ -574,7 +554,7 @@ class MainFrame(QMainWindow):
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
 
         #put margins around the widget
-        self.controlPanelLeft.setContentsMargins( 0, 100, 0, 0)
+        self.controlPanelLeft.setContentsMargins( 0, 20, 0, 0)
 
         #add group button to make exclusive some of the checkbox
         self.GroupRecording = QtGui.QButtonGroup(self.controlPanelLeft)
@@ -582,8 +562,8 @@ class MainFrame(QMainWindow):
         self.GroupFilter = QtGui.QButtonGroup(self.controlPanelLeft)
 
         #add the checkboxs to the group
-        self.GroupRecording.addButton(self.checkboxStartRecording)
-        self.GroupRecording.addButton(self.checkboxStopRecording)
+        self.GroupRecording.addButton(self.StartRecording)
+        self.GroupRecording.addButton(self.StopRecording)
 
         #make the groups exclusive
         self.GroupRecording.setExclusive(True)
@@ -681,7 +661,7 @@ class MainFrame(QMainWindow):
     #
     def updateDisplay(self):
         
-        print "[Oh yeah, I update]"
+        #print "[Oh yeah, I update]"
         
         # test if there is a new portion of signal
         # to display
