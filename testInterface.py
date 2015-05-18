@@ -335,6 +335,10 @@ class MainFrame(QMainWindow):
         self.informationLabel2 = QtGui.QLabel(u"Valeur crète à crète: rad/s")
         self.informationLabel3 = QtGui.QLabel(u"Temps d'enregistrement : s")
         self.informationLabel4 = QtGui.QLabel(u"Déphasage : rad/s")
+
+        self.infoAction        = QtGui.QLineEdit("Action en cours : ",self)
+        self.infoAction.isReadOnly()
+        self.infoAction.setText("None")
         
         
         # add this label to the global interface
@@ -343,6 +347,8 @@ class MainFrame(QMainWindow):
         self.signalInformationLayout.addWidget(self.informationLabel2, 1, 0)
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
+
+        self.signalInformationLayout.addWidget(self.informationLabel4, 0, 1)
         
         self.signalInformation = QWidget()
         self.signalInformation.setLayout(self.signalInformationLayout)
@@ -706,7 +712,7 @@ class MainFrame(QMainWindow):
         if triggerStep > 0.0 :
             self.signalFrame.getCurrentSignal().startTrigger(triggerStep, 4)
         else :
-            print "wowowo, on se calme, y'a pas de valeur dans l'inputbox"
+            print "wowowo, on se calme, y'a pas de valeur dans l'inputbox là"
     
     def exportFile(self):
         
@@ -740,6 +746,7 @@ class MainFrame(QMainWindow):
     def startRecord(self):
 
         print "[Start recording] Allez ça part !"
+        self.infoAction.setText("[Recording] Allez ça part !")
         
         # restart current signal acquisition
         self.signalFrame.getCurrentSignal().threadsDieNow = False
@@ -756,8 +763,14 @@ class MainFrame(QMainWindow):
 
     def stopRecording(self):
 
+        self.infoAction.setText("None")
+
+        # stop all recording process
         print "[Stop recording]"
         self.signalFrame.getCurrentSignal().stopRecording()
+
+        # restart real time display but without recording process
+        self.startRealTimeSignalDisplay()
 
 def main(args):
     

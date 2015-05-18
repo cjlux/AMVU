@@ -84,17 +84,19 @@ class Signal():
     def setTimeSignal(self, newTimeSignal):
         """ set the time and frequential signal from a new time signal"""
         self.timeSignal = newTimeSignal
-        self.freqSignal = getFreqSignalFromTimeSignal(newTimeSignal)
+        self.frequentialSignal = getFreqSignalFromTimeSignal(newTimeSignal)
         
     def setFreqSignal(self, newFreqSignal):
         """ set the time and frequential signal from a new frequential signal """
-        self.freqSignal = newFreqSignal
+        self.frequentialSignal = newFreqSignal
         self.timeSignal = getTimeSignalFromFreqSignal(newFreqSignal)
     
     def startRecording(self, time=None):
         """
         Start to record signal parts in timeSignal for time second if time is given
         """
+        print "[Start recording]"
+        
         self.recordingProcess = Thread(target=self.record)
         self.recordingProcess.start()
         
@@ -103,7 +105,7 @@ class Signal():
             t.sleep(time)
             self.stopRecording()
             
-    def __updateTriggerAnalysis(self, step, signalPartsRecording):
+    def __updateTriggerAnalysis(self, step):
         """
         This function may not be called by class user.
         Else it will probably cause huge dammages, like
@@ -114,6 +116,8 @@ class Signal():
         If it is, the signal start to be recorded.
         If not, the signal is not recorded.
         """
+
+        print "[Trigger] Wait for a suffisant signal"
         
         # ready to record
         self.threadsDieNow  = False
@@ -132,23 +136,28 @@ class Signal():
                     if (self.signalPart[i]>step) :
                         # trigger is set off
                         
-                        print "[startTrigger] start recording"
+                        print "[Trigger] start recording"
     
                         # end of signal parts recording
                         # and trigger analysis
-                        signalPartsRecording.Terminated = True
-                        isTriggerSetOff = True
+                        self.threadsDieNow  = True
+                        isTriggerSetOff     = True
                         
                         # start recording the signal
                         # acquisition will be done at the same time for
                         # frenquential and time signal
                         self.timeSignal.append(numpy.copy(self.signalPart))
-                        self.timeSignal.append(getFreqSignalFromTimeSignal(numpy.copy(self.signalPart)))
+                        self.frequentialSignal.append(Signal.getFreqSignalFromTimeSignal(numpy.copy(self.signalPart)))
                         self.startRecording()
+                        
                         break
         
                 # this portion of signal have been analyzed      
                 self.newAudio = False
+
+        print "[Trigger] end of the function"
+
+        
             
     #
     # TODO : need to optimize
@@ -168,12 +177,12 @@ class Signal():
         print "[startTrigger("+str(step)+")]"
         
         # start signal parts recording
-        signalPartsRecording = Thread(target=self.__recordSignalPart)
-        signalPartsRecording.start()
+        self.signalPartsRecording = Thread(target=self.__recordSignalPart)
+        self.signalPartsRecording.start()
         
         # signal analysis to start recording when trigger is set off
-        triggerAnalysis = Thread(target=self.__updateTriggerAnalysis(step, signalPartsRecording))
-        triggerAnalysis.start()
+        self.triggerAnalysis = Thread(target=self.__updateTriggerAnalysis(step))
+        self.triggerAnalysis.start()
         
         # if time given, stop recording when time is reached
         if time!=None :
