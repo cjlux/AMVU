@@ -270,7 +270,13 @@ class Signal():
         """
         
         # filtering signalParts
+        #valeurfreq = self.signalPart 
+        #fc =(w0+w1)/2
+        #deltafc = abs(w1-w0)
         
+        #for k in range(len(valeurfreq)):
+        #    if fc-Deltafc>valeurfreq[k] or valeurfreq[k]>fc+Deltafc :
+        #        valeursignal[k]=0
         # [...]
         # Filtering stuff
         # [...]
@@ -406,7 +412,25 @@ class Signal():
         filteredSignal.setTimeSignal(filteredSignalParts)
         
         return filteredSignal
-    
+
+    def getAntiNoiseSignal(noisePercent) :
+        """ k between 0 and 1 """
+        Amax = 0
+        freqSignalPart = getFreqSignalFromTimeSignal(self.signalPart)
+        for k in range(len(freqSignalPart)) :
+            if freqSignalPart[k] > Amax :
+                Amax = freqSignalPart[k]         #Research of FFT's max value
+
+        for k in range(len(freqSignalPart)):
+            if freqSignalPart[k] < noisePercent*Amax :   
+                freqSignalPart[k] = 0
+
+        resultSignal = Signal(self.rate, self.size, self.format, self.channel)
+        resultSignal.setFreqSignal(freqSignalPart)
+        
+        return resultSignal    
+        
+        
     #
     # = Under development ================
     #

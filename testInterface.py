@@ -348,8 +348,10 @@ class MainFrame(QMainWindow):
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
 
-        self.signalInformationLayout.addWidget(self.informationLabel4, 0, 1)
-        
+        #set the infoAction box on the signalInformationLayout
+        self.signalInformationLayout.addWidget(self.infoAction, 3, 1)
+
+                
         self.signalInformation = QWidget()
         self.signalInformation.setLayout(self.signalInformationLayout)
         
@@ -461,13 +463,19 @@ class MainFrame(QMainWindow):
         self.InputBoxChanel1Sensibility = QtGui.QLineEdit(self)
         self.InputBoxChanel2Sensibility = QtGui.QLineEdit(self)
 
+##        #modifie the value of the slider
+##        self.sliderAntiNoise.setMinimum(0)
+##        self.sliderAntiNoise.setMaximum(1)
+##        self.sliderAntiNoise.setValue(0.05)
+        
+        
+
         #create label with the text of the inputbox as a Widget to be put in the grid above the checkbox
         self.EmptyText = QtGui.QLabel(" ")
         self.InputBoxNSecondText = QtGui.QLabel("sec")
         self.InputBoxThresholdText = QtGui.QLabel("Threshold")
         self.InputBoxFrequency1Text = QtGui.QLabel("Frequency 1")
         self.InputBoxFrequency2Text = QtGui.QLabel("Frequency 2")
-        self.InputBoxOffsetText = QtGui.QLabel("Offset")
         self.InputBoxChanel1SensibilityText = QtGui.QLabel("Channel 1 Sensibility")
         self.InputBoxChanel2SensibilityText = QtGui.QLabel("Channel 2 Sensibility")       
                
@@ -484,6 +492,7 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 5, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 5, 2)        
         self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 6, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 6, 1)
         self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 7, 0)
         self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 1)
         self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 8, 0)
@@ -496,8 +505,6 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1, 11, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2Text, 12, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2, 12, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxOffsetText, 13, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 13, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1Sensibility, 14, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel1SensibilityText, 14, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxChanel2Sensibility, 15, 0)
@@ -581,14 +588,21 @@ class MainFrame(QMainWindow):
         """ Display signal in temporal and frequential form """
         
         #print "[Oh yeah, I display]"
+
+        # get the signal modified by option selected by the user
         
-        # get the data to display
-        dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLastSignalRecordedPart()
-        rate          = self.signalFrame.signalList[self.signalFrame.currentSignal].rate
+        if False :
+            #noisePercent  = 
+            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getAntiNoiseSignal(noisePercent)
+            rate          = self.signalFrame.signalList[self.signalFrame.currentSignal].rate    
+        else :
+            # get the data to display
+            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLastSignalRecordedPart()
+            rate          = self.signalFrame.signalList[self.signalFrame.currentSignal].rate
         
-        # display it
-        self.signalFrame.timeScope.update(dataToDisplay, rate)
-        self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
+            # display it
+            self.signalFrame.timeScope.update(dataToDisplay, rate)
+            self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
  
     #
     # -----------------------------------------------------------------
@@ -612,6 +626,8 @@ class MainFrame(QMainWindow):
         self.connect(self.StartRecording, QtCore.SIGNAL('clicked()'), self.startRecord)
         self.connect(self.StopRecording, QtCore.SIGNAL('clicked()'), self.stopRecording)
         self.connect(self.Trigger, QtCore.SIGNAL('clicked()'), self.launchTrigger)
+        #self.connect(sliderAntiNoise, Qt.SIGNAL(""))
+
     #
     # ------------------------------------------------------------------
     #
@@ -760,6 +776,7 @@ class MainFrame(QMainWindow):
         timer = QtCore.QTimer()
         timer.start(1.0)
         self.connect(timer, QtCore.SIGNAL('timeout()'), self.updateDisplay)
+        
 
     def stopRecording(self):
 
@@ -771,6 +788,12 @@ class MainFrame(QMainWindow):
 
         # restart real time display but without recording process
         self.startRealTimeSignalDisplay()
+
+    def getAntiNoiseWorking(self):
+
+        if self.checkboxAntiNoise.isChecked() == 1:
+            self.AntinoiseSliderValue = self.sliderAntiNoise.getValue()
+
 
 def main(args):
     
