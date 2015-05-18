@@ -63,7 +63,7 @@ class Plot(Qwt.QwtPlot):
         
         # Graphic user interface
         apply(Qwt.QwtPlot.__init__, (self,) + args)
-        #self.setFixedSize(400,200)
+########        self.setFixedSize(0.4*width_fenetre,0.8*height_fenetre)
         
         # define grid
         self.grid = Qwt.QwtPlotGrid()
