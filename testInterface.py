@@ -440,7 +440,7 @@ class MainFrame(QMainWindow):
         self.checkboxIntegrate = QtGui.QCheckBox("",self)
 
         self.checkboxAntiNoise = QtGui.QCheckBox("",self)
-        self.sliderAntiNoise = QtGui.QSlider(self)
+        self.sliderAntiNoise = QtGui.QSlider(QtCore.Qt.Horizontal,self)
                 
         self.checkboxLP = QtGui.QCheckBox("",self)
         self.checkboxHP = QtGui.QCheckBox("",self)
@@ -595,11 +595,17 @@ class MainFrame(QMainWindow):
         print "[Connect GUI]"
         # self.controlButtonVerticalScale
         # self.controlButtonHorizontalScale
+
+        # knobs on the right - signal rate, size, scale
         self.connect(self.controlButtonSize, Qt.SIGNAL("valueChanged(double)"), self.setSize)
         self.connect(self.controlButtonRate, Qt.SIGNAL("valueChanged(double)"), self.setRate)
         self.connect(self.controlButtonVerticalScale, Qt.SIGNAL("valueChanged(double)"), self.setVerticalScale)
         self.connect(self.controlButtonHorizontalScale, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
- 
+
+        # controls in the center of the application
+        self.connect(self.StartRecording, QtCore.SIGNAL('clicked()'), self.startRecord)
+        self.connect(self.StopRecording, QtCore.SIGNAL('clicked()'), self.stopRecording)
+        self.connect(self.Trigger, QtCore.SIGNAL('clicked()'), self.launchTrigger)
     #
     # ------------------------------------------------------------------
     #
@@ -688,10 +694,19 @@ class MainFrame(QMainWindow):
     def launchTrigger(self):
         
         # set the default value for the trigger
-        triggerStep = 12222
+        try :
+            triggerStep = float(self.InputBoxThreshold.text())
+        except :
+            print "Rentrer une valeur valide nom de Zeus"
+            triggerStep = 0.0
+
+        print "[Launch trigger] : "+str(triggerStep)
         
         # launch the trigger
-        self.signalFrame.getCurrentSignal().startTrigger(triggerStep, 4)
+        if triggerStep > 0.0 :
+            self.signalFrame.getCurrentSignal().startTrigger(triggerStep, 4)
+        else :
+            print "wowowo, on se calme, y'a pas de valeur dans l'inputbox"
     
     def exportFile(self):
         
@@ -705,40 +720,44 @@ class MainFrame(QMainWindow):
 # ====================================================
 #
 
-def startRealTimeSignalDisplay():
-    
-    # restart current signal acquisition
-    SCOPE.signalFrame.getCurrentSignal().threadsDieNow = False
-    
-    # restart signal recording
-    SCOPE.signalFrame.getCurrentSignal().startRealTimeDisplay()
-    # at any time
-    #SR.startTrigger()
-    
-    print "[Start RTSD]"
-    
-    # display continuous signal
-    timer = QtCore.QTimer()
-    timer.start(1.0)
-    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), SCOPE.updateDisplay)
+    def startRealTimeSignalDisplay(self):
+        
+        # restart current signal acquisition
+        self.signalFrame.getCurrentSignal().threadsDieNow = False
+        
+        # restart signal recording
+        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
+        # at any time
+        #SR.startTrigger()
+        
+        print "[Start real time display]"
+        
+        # display continuous signal
+        timer = QtCore.QTimer()
+        timer.start(1.0)
+        self.connect(timer, QtCore.SIGNAL('timeout()'), self.updateDisplay)
 
-def startRecord():
-    
-    # restart current signal acquisition
-    SCOPE.signalFrame.getCurrentSignal().threadsDieNow = False
-    
-    # restart signal recording
-    SCOPE.signalFrame.getCurrentSignal().startRecording() # signal SR = current sound card record
-                        # at any time
-    #SR.startTrigger()
-    
-    # display continuous signal
-    timer = QtCore.QTimer()
-    timer.start(1.0)
-    SCOPE.connect(timer, QtCore.SIGNAL('timeout()'), SCOPE.updateDisplay)
+    def startRecord(self):
 
-def stopRecording():
-    SCOPE.signalFrame.getCurrentSignal().stopRecording()
+        print "[Start recording] Allez ça part !"
+        
+        # restart current signal acquisition
+        self.signalFrame.getCurrentSignal().threadsDieNow = False
+        
+        # restart signal recording
+        self.signalFrame.getCurrentSignal().startRecording() # signal SR = current sound card record
+                            # at any time
+        #SR.startTrigger()
+        
+        # display continuous signal
+        timer = QtCore.QTimer()
+        timer.start(1.0)
+        self.connect(timer, QtCore.SIGNAL('timeout()'), self.updateDisplay)
+
+    def stopRecording(self):
+
+        print "[Stop recording]"
+        self.signalFrame.getCurrentSignal().stopRecording()
 
 def main(args):
     
@@ -766,7 +785,7 @@ def main(args):
     #startRecord()
     
     # start real time signal acquisition
-    startRealTimeSignalDisplay()
+    SCOPE.startRealTimeSignalDisplay()
     
     # display continuous signal
     timer = QtCore.QTimer()
