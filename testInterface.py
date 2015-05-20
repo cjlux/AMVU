@@ -1,5 +1,7 @@
-
 #-*-coding: utf-8 -*-
+#!/usr/bin/env python
+from __future__ import division
+
 from PyQt4 import QtGui
 from PyQt4.QtGui import QMainWindow,QWidget,QAction,QTabWidget,QApplication
 from PyQt4 import Qt
@@ -16,6 +18,7 @@ from Signal import Signal
 from SignalFrame import SignalFrame
 
 # Last update : S122, 13/05/2015
+# test line for git integration S122 
 
 #
 # Global values
@@ -449,7 +452,7 @@ class MainFrame(QMainWindow):
         self.checkboxDerivate = QtGui.QCheckBox("",self)
         self.checkboxIntegrate = QtGui.QCheckBox("",self)
         self.checkboxAntiNoise = QtGui.QCheckBox("",self)
-        self.SliderAntiNoise = QtGui.QSlider(QtCore.Qt.Horizontal,self)
+        self.sliderAntiNoise = QtGui.QSlider(QtCore.Qt.Horizontal,self)
         self.checkboxLP = QtGui.QCheckBox("",self)
         self.checkboxHP = QtGui.QCheckBox("",self)
         self.checkboxBP = QtGui.QCheckBox("",self)
@@ -493,7 +496,7 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 7, 0)
         self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 1)
         self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 8, 0)
-        self.controlPanelLeftLayout.addWidget(self.SliderAntiNoise, 8, 1)
+        self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 8, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 8, 2)
         self.controlPanelLeftLayout.addWidget(self.checkboxLP, 9, 0)
         self.controlPanelLeftLayout.addWidget(self.checkboxHP, 9, 1)
@@ -583,23 +586,76 @@ class MainFrame(QMainWindow):
     def displaySignal(self):
         """ Display signal in temporal and frequential form """
         
-        #print "[Oh yeah, I display]"
+        #print "[Oh yeah, I display]" self.checkboxAntiNoise.isChecked() 
 
         # get the signal modified by option selected by the user
+        # a signal recorded is pure : the filters, anti-noise, ... treatement
+        # are visible (are displayed) but doesn't alter the signal recorded
+
+        timeSignal = True # say if a signal is in a time format
+
+        rate = self.signalFrame.signalList[self.signalFrame.currentSignal].rate
         
-        if False :
-            #noisePercent  = 
-            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getAntiNoiseSignal(noisePercent)
-            rate          = self.signalFrame.signalList[self.signalFrame.currentSignal].rate    
+        if self.checkboxAntiNoise.isChecked() :
+
+            # get the antinoise percentage and display the anti-noised signal
+            noisePercent  = self.sliderAntiNoise.value()/100
+            # self.sliderAntiNoise.value()
+
+            print "[display] Anti-noise altered signal "+str(noisePercent)
+            
+            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getAntiNoiseSignalPart(noisePercent)
+
+            timeSignal = False
+
+        elif self.checkboxHP.isChecked() :
+
+            # set the default value for the cutting frequency
+            try :
+                wo = float(self.InputBoxFrequency1.text())
+            except :
+                print "Rentrez une valeur valide nom de Zeus !"
+                wo = 0.0
+            
+            print "[display] HighPass filtered signal at "+str(wo)
+            
+            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getHPFilteredSignalPart(wo)
+
+        elif self.checkboxLP.isChecked() :
+
+            # set the default value for the cutting frequency
+            try :
+                wo = float(self.InputBoxFrequency1.text())
+            except :
+                print "Rentrez une valeur valide nom de Zeus !"
+                wo = 0.0
+            
+            print "[display] LowPass filtered signal at "+str(wo)
+            
+            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLPFilteredSignalPart(wo)
+            
         else :
+            
+            print "[display] Pure signal"
+            
             # get the data to display
             dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLastSignalRecordedPart()
-            rate          = self.signalFrame.signalList[self.signalFrame.currentSignal].rate
-        
-            # display it
+
+        # display the signal
+        if timeSignal :
+            
+            # display it by refresh plot values to display
             self.signalFrame.timeScope.update(dataToDisplay, rate)
             self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
- 
+
+        else :
+            
+            # display it by refresh plot values to display
+            self.signalFrame.freqScope.update(dataToDisplay, rate)
+            self.signalFrame.timeScope.update(Signal.getTimeSignalFromFreqSignal(dataToDisplay), rate)
+
+
+             
     #
     # -----------------------------------------------------------------
     # 
@@ -623,7 +679,7 @@ class MainFrame(QMainWindow):
         self.connect(self.StartRecording, QtCore.SIGNAL('clicked()'), self.startRecord)
         self.connect(self.StopRecording, QtCore.SIGNAL('clicked()'), self.stopRecording)
         self.connect(self.Trigger, QtCore.SIGNAL('clicked()'), self.launchTrigger)
-        #self.connect(sliderAntiNoise, Qt.SIGNAL(""))
+        self.connect(self.sliderAntiNoise, QtCore.SIGNAL('valueChanged(int)'), self.setAntiNoise)
 
     #
     # ------------------------------------------------------------------
@@ -633,7 +689,7 @@ class MainFrame(QMainWindow):
     # ------------------------------------------------------------------
     #
     
-    def __deleteCurrentSignal(self):
+    def deleteCurrentSignal(self):
         self.signalFrame.deleteCurrentSignal()
     
     def setSize(self, newSize):
@@ -676,6 +732,10 @@ class MainFrame(QMainWindow):
         self.signalFrame.deleteAllSignal()
         self.close()
     
+    def setAntiNoise(self):
+        print "[Anti noise] "+str(self.sliderAntiNoise.value())
+        #self.signalFrame.getFreqScope().setVerticalScale(newVerticalScale)
+    
     #
     # ==================================================================
     #
@@ -716,7 +776,7 @@ class MainFrame(QMainWindow):
         try :
             triggerStep = float(self.InputBoxThreshold.text())
         except :
-            print "Rentrer une valeur valide nom de Zeus"
+            print "Rentrez une valeur valide nom de Zeus"
             triggerStep = 0.0
 
         print "[Launch trigger] : "+str(triggerStep)
@@ -786,10 +846,11 @@ class MainFrame(QMainWindow):
         # restart real time display but without recording process
         self.startRealTimeSignalDisplay()
 
-    def getAntiNoiseWorking(self):
-
-        if self.checkboxAntiNoise.isChecked() == 1:
-            self.AntinoiseSliderValue = self.sliderAntiNoise.getValue()
+#    def getAntiNoiseWorking(self):
+#
+#        if self.checkboxAntiNoise.isChecked() == 1:
+#            self.AntinoiseSliderValue = self.sliderAntiNoise.getValue()
+#            print "[Slider value] "+str(self.AntinoiseSliderValue)
 
 
 def main(args):

@@ -259,39 +259,8 @@ class Signal():
     
     #
     # = Under development ================
-    #
-    def getBPFilteredTimeSignal(self, w0, w1):
-        """
-        Return band pass filtered time signal in a new signal object
-        w0 and w1 stand for the cutoff frequencies.
-        * If channel number is 1   : an array of an array containing the signal values is returned
-        * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
-        * If channel number is n>2 : it will probably explode
-        """
-        
-        # filtering signalParts
-        #valeurfreq = self.signalPart 
-        #fc =(w0+w1)/2
-        #deltafc = abs(w1-w0)
-        
-        #for k in range(len(valeurfreq)):
-        #    if fc-Deltafc>valeurfreq[k] or valeurfreq[k]>fc+Deltafc :
-        #        valeursignal[k]=0
-        # [...]
-        # Filtering stuff
-        # [...]
-        #filteredSignalParts = numpy.array(...)
-        
-        # create a new signal object containing the filtered signal result
-        filteredSignal = Signal(self.rate, self.size, self.format, self.channel)
-        filteredSignal.setTimeSignal(filteredSignalParts)
-        
-        return filteredSignal
-    
-    #
-    # = Under development ================
     #    
-    def getBPFilteredFreqSignal(self, w0, w1):
+    def getBPFilteredSignalPart(self, w0, w1):
         """
         Return band pass filtered frequential signal in a new signal object
         w0 and w1 stand for the cutoff frequencies.
@@ -316,32 +285,7 @@ class Signal():
     #
     # = Under development ================
     #
-    def getLPFilteredTimeSignal(self, w0):
-        """
-        Return low pass time time signal in a new signal object
-        w0 stands for the cutoff frequency.
-        * If channel number is 1   : an array of an array containing the signal values is returned
-        * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
-        * If channel number is n>2 : it will probably explode
-        """
-        
-        # filtering signalParts
-        
-        # [...]
-        # Filtering stuff
-        # [...]
-        #filteredSignalParts = numpy.array(...)
-        
-        # create a new signal object containing the filtered signal result
-        filteredSignal = Signal(self.rate, self.size, self.format, self.channel)
-        filteredSignal.setTimeSignal(filteredSignalParts)
-        
-        return filteredSignal
-    
-    #
-    # = Under development ================
-    #
-    def getLPFilteredFreqSignal(self, w0):
+    def getLPFilteredSignalPart(self, wo):
         """
         Return low pass filtered frequential signal in a new signal object
         w0 stands for the cutoff frequency.
@@ -349,49 +293,20 @@ class Signal():
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
         """
+
+        freqSignalPart = Signal.getFreqSignalFromTimeSignal(self.signalPart)
+        timeSignalPart = self.signalPart.copy()
         
-        # filtering signalParts
+        for k in range(len(freqSignalPart)):
+            if freqSignalPart[k]>wo :   #Filter definition
+                timeSignalPart[k]=0   #Values outside filter's range =0
         
-        # [...]
-        # Filtering stuff
-        # [...]
-        #filteredSignalParts = numpy.array(...)
-        
-        # create a new signal object containing the filtered signal result
-        filteredSignal = Signal(self.rate, self.size, self.format, self.channel)
-        filteredSignal.setTimeSignal(filteredSignalParts)
-        
-        return filteredSignal
+        return Signal.getWellFormatedSignal(timeSignalPart, self.channel)
     
     #
     # = Under development ================
     #
-    def getHPFilteredTimeSignal(self, w0):
-        """
-        Return high pass filtered time signal in a new signal object
-        w0 stands for the cutoff frequency.
-        * If channel number is 1   : an array of an array containing the signal values is returned
-        * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
-        * If channel number is n>2 : it will probably explode
-        """
-        
-        # filtering signalParts
-        
-        # [...]
-        # Filtering stuff
-        # [...]
-        #filteredSignalParts = numpy.array(...)
-        
-        # create a new signal object containing the filtered signal result
-        filteredSignal = Signal(self.rate, self.size, self.format, self.channel)
-        filteredSignal.setTimeSignal(filteredSignalParts)
-        
-        return filteredSignal
-    
-    #
-    # = Under development ================
-    #
-    def getHPFilteredFreqSignal(self, w0):
+    def getHPFilteredSignalPart(self, wo):
         """
         Return high pass filtered filtered signal in a new signal object
         w0 stands for the cutoff frequency.
@@ -401,22 +316,22 @@ class Signal():
         """
         
         # filtering signalParts
-        
-        # [...]
-        # Filtering stuff
-        # [...]
-        #filteredSignalParts = numpy.array(...)
-        
-        # create a new signal object containing the filtered signal result
-        filteredSignal = Signal(self.rate, self.size, self.format, self.channel)
-        filteredSignal.setTimeSignal(filteredSignalParts)
-        
-        return filteredSignal
+        freqSignalPart = Signal.getFreqSignalFromTimeSignal(self.signalPart)
+        timeSignalPart = self.signalPart.copy()
 
-    def getAntiNoiseSignal(noisePercent) :
-        """ k between 0 and 1 """
+        for k in range(len(freqSignalPart)):
+            if freqSignalPart[k]<wo :   
+                timeSignalPart[k]=0
+
+        return Signal.getWellFormatedSignal(timeSignalPart, self.channel)
+
+    def getAntiNoiseSignalPart(self, noisePercent) :
+        """
+        Return a noise free signalPart, in frequential form
+        NoisePercent is percentage of noise filtered
+        """
         Amax = 0
-        freqSignalPart = getFreqSignalFromTimeSignal(self.signalPart)
+        freqSignalPart = Signal.getFreqSignalFromTimeSignal(self.signalPart)
         for k in range(len(freqSignalPart)) :
             if freqSignalPart[k] > Amax :
                 Amax = freqSignalPart[k]         #Research of FFT's max value
@@ -424,11 +339,8 @@ class Signal():
         for k in range(len(freqSignalPart)):
             if freqSignalPart[k] < noisePercent*Amax :   
                 freqSignalPart[k] = 0
-
-        resultSignal = Signal(self.rate, self.size, self.format, self.channel)
-        resultSignal.setFreqSignal(freqSignalPart)
         
-        return resultSignal    
+        return Signal.getWellFormatedSignal(freqSignalPart, self.channel)   
         
         
     #
