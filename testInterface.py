@@ -37,7 +37,8 @@ class MainFrame(QMainWindow):
 
         # signal frame for signal display and management
         self.signalFrame = signalFrame
-      
+
+              
         #know the size of the main frame
         size_fenetre = self.geometry()
         size_fenetre = size_fenetre.getCoords()
@@ -131,9 +132,6 @@ class MainFrame(QMainWindow):
         
         # Control buttons for each tab
         
-
-        # for tab 1
-
         self.StartRecording = None
         self.StartNsec = None
         self.StopRecording = None
@@ -156,18 +154,6 @@ class MainFrame(QMainWindow):
         self.InputBoxChanel1Sensibility = None
         self.InputBoxChanel2Sensibility = None
                
-#=======
-        
-        # for tab 2
-        
-#=======
-        #self.controlButton11 = None
-        #self.controlButton12 = None
-        
-        # for tab 2
-        #self.controlButton21 = None
-        #self.controlButton22 = None
-
         
         #
         # --------------------------------------------------
@@ -184,26 +170,29 @@ class MainFrame(QMainWindow):
         self.globalInterfaceLeft = QWidget()
         self.globalInterfaceLeftLayout = QtGui.QGridLayout()
         self.globalInterfaceLeft.setLayout(self.globalInterfaceLeftLayout)
+        self.globalInterfaceLeft.adjustSize()
         
         self.globalInterfaceRight = QWidget()
         self.globalInterfaceRightLayout = QtGui.QGridLayout()
         self.globalInterfaceRight.setLayout(self.globalInterfaceRightLayout)
+        self.globalInterfaceRight.adjustSize()
         
         self.globalInterfaceCenter = QWidget()
         self.globalInterfaceCenterLayout = QtGui.QGridLayout()
         self.globalInterfaceCenter.setLayout(self.globalInterfaceCenterLayout)
+        self.globalInterfaceCenter.adjustSize()
         
         # set the link between this interfaces
         self.globalInterfaceLayout.addWidget(self.globalInterfaceLeft, 0, 0)
         self.globalInterfaceLayout.addWidget(self.globalInterfaceCenter, 0, 1)
         self.globalInterfaceLayout.addWidget(self.globalInterfaceRight, 0, 2)
         
-        self.globalInterface.setLayout(self.globalInterfaceLayout)
-        
+        self.globalInterface.setLayout(self.globalInterfaceLayout)        
         self.setCentralWidget(self.globalInterface)
 
         #change size of the widget
-        self.globalInterfaceCenter.setFixedSize(0.55*width_fenetre,height_fenetre)
+        self.globalInterfaceCenter.setFixedSize(0.5*width_fenetre,height_fenetre)
+        self.globalInterfaceRight.setFixedSize(0.5*width_fenetre,height_fenetre)
 
     def setTitle(self, titre="") :
         self.setWindowTitle(titre)
@@ -369,16 +358,20 @@ class MainFrame(QMainWindow):
         self.controlButtonVerticalScale1.setTotalAngle(270)
         self.controlButtonVerticalScale2 = Qwt.QwtKnob()
         self.controlButtonVerticalScale2.setTotalAngle(270)
-        self.controlButtonHorizontalScale = Qwt.QwtKnob()
-        self.controlButtonHorizontalScale.setTotalAngle(270)
+        self.controlButtonHorizontalScale1 = Qwt.QwtKnob()
+        self.controlButtonHorizontalScale1.setTotalAngle(270)
+        self.controlButtonHorizontalScale2 = Qwt.QwtKnob()
+        self.controlButtonHorizontalScale2.setTotalAngle(270)
         
         # set propreties for this controls
-        self.controlButtonVerticalScale1.setScale(0, 1, 0.2)
+        self.controlButtonVerticalScale1.setScale(0, 1, 0.2)    #Modify the values to fit the real ones
         self.controlButtonVerticalScale1.setRange(0, 1)
         self.controlButtonVerticalScale2.setScale(0, 1, 0.2)
         self.controlButtonVerticalScale2.setRange(0, 1)
-        self.controlButtonHorizontalScale.setScale(0, 0.5, 0.1)
-        self.controlButtonHorizontalScale.setRange(0, 0.5)
+        self.controlButtonHorizontalScale1.setScale(0, 0.5, 0.1)
+        self.controlButtonHorizontalScale1.setRange(0, 0.5)
+        self.controlButtonHorizontalScale2.setScale(0, 0.5, 0.1)
+        self.controlButtonHorizontalScale2.setRange(0, 0.5)        
         
         # signal size and rate controls
         self.controlButtonSize = Qwt.QwtKnob()
@@ -395,9 +388,10 @@ class MainFrame(QMainWindow):
         # disposition on the layout
         self.controlPanelRightLayout.addWidget(self.controlButtonVerticalScale1, 0, 0)
         self.controlPanelRightLayout.addWidget(self.controlButtonVerticalScale2, 0, 1)
-        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale, 2, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale1, 2, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale2, 2, 1)
         self.controlPanelRightLayout.addWidget(self.controlButtonSize, 4, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButtonRate, 6, 0)
+        self.controlPanelRightLayout.addWidget(self.controlButtonRate, 4, 1)
 
         
         # set  all buttons' Ranges     
@@ -405,24 +399,27 @@ class MainFrame(QMainWindow):
 
         # Add text under each button
 
-        self.button0Text = Qt.QLabel("Vertical Scale Channel 1")
-        self.button0Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button1Text = Qt.QLabel("Vertical Scale Channel 2")
+        self.button1Text = Qt.QLabel("Vertical Scale \n Channel 1")
         self.button1Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button2Text = Qt.QLabel("Horizontal Scale")
+        self.button2Text = Qt.QLabel("Vertical Scale \n Channel 2")
         self.button2Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button3Text = Qt.QLabel("Size")
+        self.button3Text = Qt.QLabel("Time Scale")
         self.button3Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button4Text = Qt.QLabel("Rate")
+        self.button4Text = Qt.QLabel("Frequence Scale")
         self.button4Text.setAlignment(QtCore.Qt.AlignCenter)
+        self.button5Text = Qt.QLabel("Size")
+        self.button5Text.setAlignment(QtCore.Qt.AlignCenter)
+        self.button6Text = Qt.QLabel("Rate")
+        self.button6Text.setAlignment(QtCore.Qt.AlignCenter)
 
         # set all the texts and add them to the layout
 
-        self.controlPanelRightLayout.addWidget(self.button0Text, 1, 0)
-        self.controlPanelRightLayout.addWidget(self.button1Text, 1, 1)
-        self.controlPanelRightLayout.addWidget(self.button2Text, 3, 0)
-        self.controlPanelRightLayout.addWidget(self.button3Text, 5, 0)
-        self.controlPanelRightLayout.addWidget(self.button4Text, 7, 0)   
+        self.controlPanelRightLayout.addWidget(self.button1Text, 1, 0)
+        self.controlPanelRightLayout.addWidget(self.button2Text, 1, 1)
+        self.controlPanelRightLayout.addWidget(self.button3Text, 3, 0)
+        self.controlPanelRightLayout.addWidget(self.button4Text, 3, 1)
+        self.controlPanelRightLayout.addWidget(self.button5Text, 5, 0)
+        self.controlPanelRightLayout.addWidget(self.button6Text, 5, 1)   
            
         # add all this stuff to the global interface
         
@@ -471,30 +468,30 @@ class MainFrame(QMainWindow):
 
                 
         #create label with the text of the inputbox as a Widget to be put in the grid above the checkbox
-        self.EmptyText = QtGui.QLabel(" ")
+        self.Filters = QtGui.QLabel("Filters ")
         self.InputBoxNSecondText = QtGui.QLabel("sec")
         self.InputBoxThresholdText = QtGui.QLabel("Threshold")
         self.InputBoxFrequency1Text = QtGui.QLabel("Frequency 1")
         self.InputBoxFrequency2Text = QtGui.QLabel("Frequency 2")
-        self.InputBoxChannel1SensibilityText = QtGui.QLabel("Info Sensor Channel 1")
-        self.InputBoxChannel2SensibilityText = QtGui.QLabel("Info Sensor Channel 2")       
+        self.InputBoxChannel1SensibilityText = QtGui.QLabel("Info Sensor \n Channel 1")
+        self.InputBoxChannel2SensibilityText = QtGui.QLabel("Info Sensor \n Channel 2")       
                
 
         # add all the controls and text to the layout
-        self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)
-        self.controlPanelLeftLayout.addWidget(self.EmptyText, 1, 0)
-        self.controlPanelLeftLayout.addWidget(self.StartRecording, 2, 0)
-        self.controlPanelLeftLayout.addWidget(self.StartNsec, 3, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 3, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecondText, 3, 2)
-        self.controlPanelLeftLayout.addWidget(self.StopRecording, 4, 0)
-        self.controlPanelLeftLayout.addWidget(self.Trigger, 5, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 5, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 5, 2)        
-        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 6, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 6, 1)
-        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 7, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 1)
+        self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)        
+        self.controlPanelLeftLayout.addWidget(self.StartRecording, 1, 0)
+        self.controlPanelLeftLayout.addWidget(self.StartNsec, 2, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 2, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecondText, 2, 2)
+        self.controlPanelLeftLayout.addWidget(self.StopRecording, 3, 0)
+        self.controlPanelLeftLayout.addWidget(self.Trigger, 4, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 4, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 4, 2)        
+        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 5, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 5, 1)        
+        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 6, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 6, 1)
+        self.controlPanelLeftLayout.addWidget(self.Filters, 7, 0)
         self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 8, 0)
         self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 8, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 8, 2)
@@ -520,6 +517,7 @@ class MainFrame(QMainWindow):
         self.StartNsec.setToolTip('Start recording the measure for a number of seconds specified. The record will automatically stop itself')
         self.StopRecording.setToolTip('Stop recording the measure')
         self.Trigger.setToolTip('Use the mode Trigger to automatically start recording for the threshold specified')
+        self.InputBoxThreshold.setToolTip(u'Indicate the value of the threshold in % of the value max known')
         self.checkboxOffset.setToolTip('Add an offset to the measure ')
         self.InputBoxOffset.setToolTip('Indicate the value of the constant value of the signal if it is known')
      
@@ -538,8 +536,7 @@ class MainFrame(QMainWindow):
         self.InputBoxChannel1Units.setToolTip('Indicate the units of the sensor used by the channel 1')
         self.InputBoxChannel2Sensibility.setToolTip('Indicate the value of the sensor used by the channel 2')
         self.InputBoxChannel2Units.setToolTip('Indicate the units of the sensor used by the channel 2')
-        
-        
+             
         
 
         #add text to all the buttons
@@ -552,11 +549,11 @@ class MainFrame(QMainWindow):
         self.checkboxDerivate.setText('Derivate')
         self.checkboxIntegrate.setText('Integrate')
 
-        self.checkboxAntiNoise.setText('AntiNoise Filter')
-        self.checkboxLP.setText('Low Pass Filter')
-        self.checkboxHP.setText('High Pass Filter')
-        self.checkboxBP.setText('Band Pass Filter')
-        self.checkboxCut.setText('Band Cut Filter')   
+        self.checkboxAntiNoise.setText('AntiNoise')
+        self.checkboxLP.setText('Low Pass')
+        self.checkboxHP.setText('High Pass')
+        self.checkboxBP.setText('Band Pass')
+        self.checkboxCut.setText('Band Cut')   
 
         
         # add all this stuff to the global interface
@@ -566,7 +563,7 @@ class MainFrame(QMainWindow):
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
 
         #put margins around the widget
-        self.controlPanelLeft.setContentsMargins( 0, 20, 0, 0)
+        self.controlPanelLeft.setContentsMargins( 0, 0, 0, 0)
 
         #add group button to make exclusive some of the checkbox
         self.GroupRecording = QtGui.QButtonGroup(self.controlPanelLeft)
@@ -602,7 +599,7 @@ class MainFrame(QMainWindow):
             noisePercent  = self.sliderAntiNoise.value()/100
             # self.sliderAntiNoise.value()
 
-            print "[display] Anti-noise altered signal "+str(noisePercent)
+            #print "[display] Anti-noise altered signal "+str(noisePercent)
             
             dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getAntiNoiseSignalPart(noisePercent)
 
@@ -673,7 +670,8 @@ class MainFrame(QMainWindow):
         self.connect(self.controlButtonRate, Qt.SIGNAL("valueChanged(double)"), self.setRate)
         self.connect(self.controlButtonVerticalScale1, Qt.SIGNAL("valueChanged(double)"), self.setVerticalScale)
         self.connect(self.controlButtonVerticalScale2, Qt.SIGNAL("valueChanged(double)"), self.setVerticalScale)
-        self.connect(self.controlButtonHorizontalScale, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
+        self.connect(self.controlButtonHorizontalScale1, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
+        self.connect(self.controlButtonHorizontalScale2, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
 
         # controls in the center of the application
         self.connect(self.StartRecording, QtCore.SIGNAL('clicked()'), self.startRecord)
