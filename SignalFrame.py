@@ -41,8 +41,8 @@ class SignalFrame():
         """
         
         # referenced signal form (time or frequential)
-        self.freqScope = None
-        self.timeScope = None
+        self.freqScope 		= None
+        self.timeScope 		= None
         
         # signals storage
         self.signalList = []
@@ -92,8 +92,8 @@ class SignalFrame():
         """
         if (self.currentSignal > 0):
             self.currentSignal -= 1
-            self.freqScope = self.signalList[self.currentSignal].getWellFormattedFreqSignal()
-            self.timeScope = self.signalList[self.currentSignal].getWellFormattedTimeSignal()
+            self.freqScope 		= self.signalList[self.currentSignal].getWellFormattedFreqSignal()
+            self.timeScope 		= self.signalList[self.currentSignal].getWellFormattedTimeSignal() 
         # else : there isn't any previous signal to display
     
         # TODO : call plot update for time and freq scope
@@ -105,8 +105,8 @@ class SignalFrame():
         """
         if (self.currentSignal < len(self.signalList) - 1):
             self.currentSignal += 1
-            self.freqScope = self.signalList[self.currentSignal].getWellFormattedFreqSignal()
-            self.timeScope = self.signalList[self.currentSignal].getWellFormattedTimeSignal()
+            self.freqScope 		= self.signalList[self.currentSignal].getWellFormattedFreqSignal()
+            self.timeScope 		= self.signalList[self.currentSignal].getWellFormattedTimeSignal()
         # else : there isn't any previous signal to display
     
         # TODO : call plot update for time and freq scope
@@ -117,9 +117,8 @@ class SignalFrame():
         and make it ready to display
         """
         self.currentSignal = len(self.signalList) - 1
-        self.freqScope = FreqPlot(self.signalList[self.currentSignal].getWellFormattedFreqSignal(), self.signalList[self.currentSignal].rate, 0, 0)
-        self.timeScope = TimePlot(self.signalList[self.currentSignal].getWellFormattedTimeSignal(), self.signalList[self.currentSignal].rate, 0, 0)
-    
+        self.freqScope 		= FreqPlot(self.signalList[self.currentSignal].getWellFormattedFreqSignal(), self.signalList[self.currentSignal].rate, 0, 0)
+        self.timeScope 		= TimePlot(self.signalList[self.currentSignal].getWellFormattedTimeSignal(), self.signalList[self.currentSignal].rate, 0, 0)
         # TODO : call plot update for time and freq scope
     
     def displayDerivatedSignal(self):

@@ -34,15 +34,17 @@ class MainFrame(QMainWindow):
     def __init__(self, signalFrame):
         
         QMainWindow.__init__(self)
+        
+        # is recording ?
+        self.isRecording = False
 
         # signal frame for signal display and management
         self.signalFrame = signalFrame
-
-              
+      
         #know the size of the main frame
         size_fenetre = self.geometry()
         size_fenetre = size_fenetre.getCoords()
-        width_fenetre = size_fenetre[2]
+        width_fenetre  = size_fenetre[2]
         height_fenetre = size_fenetre[3]
           
         # tabs
@@ -132,28 +134,43 @@ class MainFrame(QMainWindow):
         
         # Control buttons for each tab
         
-        self.StartRecording = None
-        self.StartNsec = None
-        self.StopRecording = None
-        self.Trigger = None
-        self.checkboxOffset = None
-        self.checkboxAntiNoise = None
-        self.checkboxDerivate = None
-        self.checkboxIntegrate = None
-        self.checkboxLP = None
-        self.checkboxHP = None
-        self.checkboxBP = None
-        self.checkboxCut = None
 
-        self.InputBoxNSecond = None
+        # for tab 1
+
+        self.StartRecording 	= None
+        self.StartNsec 			= None
+        self.StopRecording 		= None
+        self.Trigger 			= None
+        self.checkboxOffset 	= None
+        self.checkboxAntiNoise 	= None
+        self.checkboxDerivate 	= None
+        self.checkboxIntegrate 	= None
+        self.checkboxLP 		= None
+        self.checkboxHP 		= None
+        self.checkboxBP 		= None
+        self.checkboxCut 		= None
+
+        self.InputBoxNSecond 	= None
         self.InputBoxFrequency1 = None
         self.InputBoxFrequency2 = None
-        self.InputBoxThreshold = None
-        self.InputBoxOffset = None
-        self.InputBoxAntiNoise = None
+        self.InputBoxThreshold 	= None
+        self.InputBoxOffset 	= None
+        self.InputBoxAntiNoise 	= None
         self.InputBoxChanel1Sensibility = None
         self.InputBoxChanel2Sensibility = None
                
+#=======
+        
+        # for tab 2
+        
+#=======
+        #self.controlButton11 = None
+        #self.controlButton12 = None
+        
+        # for tab 2
+        #self.controlButton21 = None
+        #self.controlButton22 = None
+
         
         #
         # --------------------------------------------------
@@ -170,29 +187,26 @@ class MainFrame(QMainWindow):
         self.globalInterfaceLeft = QWidget()
         self.globalInterfaceLeftLayout = QtGui.QGridLayout()
         self.globalInterfaceLeft.setLayout(self.globalInterfaceLeftLayout)
-        self.globalInterfaceLeft.adjustSize()
         
         self.globalInterfaceRight = QWidget()
         self.globalInterfaceRightLayout = QtGui.QGridLayout()
         self.globalInterfaceRight.setLayout(self.globalInterfaceRightLayout)
-        self.globalInterfaceRight.adjustSize()
         
         self.globalInterfaceCenter = QWidget()
         self.globalInterfaceCenterLayout = QtGui.QGridLayout()
         self.globalInterfaceCenter.setLayout(self.globalInterfaceCenterLayout)
-        self.globalInterfaceCenter.adjustSize()
         
         # set the link between this interfaces
         self.globalInterfaceLayout.addWidget(self.globalInterfaceLeft, 0, 0)
         self.globalInterfaceLayout.addWidget(self.globalInterfaceCenter, 0, 1)
         self.globalInterfaceLayout.addWidget(self.globalInterfaceRight, 0, 2)
         
-        self.globalInterface.setLayout(self.globalInterfaceLayout)        
+        self.globalInterface.setLayout(self.globalInterfaceLayout)
+        
         self.setCentralWidget(self.globalInterface)
 
         #change size of the widget
-        self.globalInterfaceCenter.setFixedSize(0.5*width_fenetre,height_fenetre)
-        self.globalInterfaceRight.setFixedSize(0.5*width_fenetre,height_fenetre)
+        #====== self.globalInterfaceCenter.setFixedSize(0.55*width_fenetre,height_fenetre)
 
     def setTitle(self, titre="") :
         self.setWindowTitle(titre)
@@ -200,15 +214,15 @@ class MainFrame(QMainWindow):
     def setGraphTab(self):
         
         # set each graph tab
-        self.timeGraphTab   = QWidget() 
-        self.freqGraphTab   = QWidget()
-        self.recordedSignal = QWidget()
+        self.timeGraphTab   	= QWidget() 
+        self.freqGraphTab   	= QWidget()
+        self.recordedSignalTab 	= QWidget()
 
         # set the tab widget hosting each graph tab
         self.signalGraph = QTabWidget(self) 
         self.signalGraph.addTab(self.timeGraphTab,"Time")
         self.signalGraph.addTab(self.freqGraphTab,"Freq")
-        self.signalGraph.addTab(self.recordedSignal,"Recorded signal")
+        self.signalGraph.addTab(self.recordedSignalTab,"Recorded signal")
         
         # add the graph tab to the global interface
         self.globalInterfaceLeftLayout.addWidget(self.signalGraph, 1, 0)
@@ -301,12 +315,13 @@ class MainFrame(QMainWindow):
         self.setGraphTab()
         
         # create the graphs
-        self.timeGraph =  self.signalFrame.timeScope
-        self.freqGraph =  self.signalFrame.freqScope
+        self.timeGraph 		= self.signalFrame.timeScope
+        self.freqGraph 		= self.signalFrame.freqScope
+        #self.recordedSignal = self.signalFrame.recordedScope
         
         # add the graphs to the tabs
-        self.timeGraphLayout = QtGui.QGridLayout()
-        self.freqGraphLayout = QtGui.QGridLayout()
+        self.timeGraphLayout 		= QtGui.QGridLayout()
+        self.freqGraphLayout 		= QtGui.QGridLayout()
         
         self.timeGraphLayout.addWidget(self.timeGraph, 0, 0)
         self.freqGraphLayout.addWidget(self.freqGraph, 0, 0)
@@ -315,7 +330,15 @@ class MainFrame(QMainWindow):
         self.freqGraphTab.setLayout(self.freqGraphLayout)
 
     def setRecordedSignalDisplay(self):
+
+        self.recordedSignal = pg.GraphicsView()
         self.recordedSignal = pg.PlotWidget()
+
+        self.recordedSignalLayout = QtGui.QGridLayout()
+        self.recordedSignalLayout.addWidget(self.recordedSignal, 0, 0)
+        self.recordedSignalTab.setLayout(self.recordedSignalLayout)
+        #self.recordedSignalTab.add(self.recordedSignal)
+
 
     def setSignalInformation(self):
         
@@ -358,20 +381,16 @@ class MainFrame(QMainWindow):
         self.controlButtonVerticalScale1.setTotalAngle(270)
         self.controlButtonVerticalScale2 = Qwt.QwtKnob()
         self.controlButtonVerticalScale2.setTotalAngle(270)
-        self.controlButtonHorizontalScale1 = Qwt.QwtKnob()
-        self.controlButtonHorizontalScale1.setTotalAngle(270)
-        self.controlButtonHorizontalScale2 = Qwt.QwtKnob()
-        self.controlButtonHorizontalScale2.setTotalAngle(270)
+        self.controlButtonHorizontalScale = Qwt.QwtKnob()
+        self.controlButtonHorizontalScale.setTotalAngle(270)
         
         # set propreties for this controls
-        self.controlButtonVerticalScale1.setScale(0, 1, 0.2)    #Modify the values to fit the real ones
+        self.controlButtonVerticalScale1.setScale(0, 1, 0.2)
         self.controlButtonVerticalScale1.setRange(0, 1)
         self.controlButtonVerticalScale2.setScale(0, 1, 0.2)
         self.controlButtonVerticalScale2.setRange(0, 1)
-        self.controlButtonHorizontalScale1.setScale(0, 0.5, 0.1)
-        self.controlButtonHorizontalScale1.setRange(0, 0.5)
-        self.controlButtonHorizontalScale2.setScale(0, 0.5, 0.1)
-        self.controlButtonHorizontalScale2.setRange(0, 0.5)        
+        self.controlButtonHorizontalScale.setScale(0, 0.5, 0.1)
+        self.controlButtonHorizontalScale.setRange(0, 0.5)
         
         # signal size and rate controls
         self.controlButtonSize = Qwt.QwtKnob()
@@ -388,10 +407,9 @@ class MainFrame(QMainWindow):
         # disposition on the layout
         self.controlPanelRightLayout.addWidget(self.controlButtonVerticalScale1, 0, 0)
         self.controlPanelRightLayout.addWidget(self.controlButtonVerticalScale2, 0, 1)
-        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale1, 2, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale2, 2, 1)
+        self.controlPanelRightLayout.addWidget(self.controlButtonHorizontalScale, 2, 0)
         self.controlPanelRightLayout.addWidget(self.controlButtonSize, 4, 0)
-        self.controlPanelRightLayout.addWidget(self.controlButtonRate, 4, 1)
+        self.controlPanelRightLayout.addWidget(self.controlButtonRate, 6, 0)
 
         
         # set  all buttons' Ranges     
@@ -399,27 +417,24 @@ class MainFrame(QMainWindow):
 
         # Add text under each button
 
-        self.button1Text = Qt.QLabel("Vertical Scale \n Channel 1")
+        self.button0Text = Qt.QLabel("Vertical Scale Channel 1")
+        self.button0Text.setAlignment(QtCore.Qt.AlignCenter)
+        self.button1Text = Qt.QLabel("Vertical Scale Channel 2")
         self.button1Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button2Text = Qt.QLabel("Vertical Scale \n Channel 2")
+        self.button2Text = Qt.QLabel("Horizontal Scale")
         self.button2Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button3Text = Qt.QLabel("Time Scale")
+        self.button3Text = Qt.QLabel("Size")
         self.button3Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button4Text = Qt.QLabel("Frequence Scale")
+        self.button4Text = Qt.QLabel("Rate")
         self.button4Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button5Text = Qt.QLabel("Size")
-        self.button5Text.setAlignment(QtCore.Qt.AlignCenter)
-        self.button6Text = Qt.QLabel("Rate")
-        self.button6Text.setAlignment(QtCore.Qt.AlignCenter)
 
         # set all the texts and add them to the layout
 
-        self.controlPanelRightLayout.addWidget(self.button1Text, 1, 0)
-        self.controlPanelRightLayout.addWidget(self.button2Text, 1, 1)
-        self.controlPanelRightLayout.addWidget(self.button3Text, 3, 0)
-        self.controlPanelRightLayout.addWidget(self.button4Text, 3, 1)
-        self.controlPanelRightLayout.addWidget(self.button5Text, 5, 0)
-        self.controlPanelRightLayout.addWidget(self.button6Text, 5, 1)   
+        self.controlPanelRightLayout.addWidget(self.button0Text, 1, 0)
+        self.controlPanelRightLayout.addWidget(self.button1Text, 1, 1)
+        self.controlPanelRightLayout.addWidget(self.button2Text, 3, 0)
+        self.controlPanelRightLayout.addWidget(self.button3Text, 5, 0)
+        self.controlPanelRightLayout.addWidget(self.button4Text, 7, 0)   
            
         # add all this stuff to the global interface
         
@@ -468,30 +483,30 @@ class MainFrame(QMainWindow):
 
                 
         #create label with the text of the inputbox as a Widget to be put in the grid above the checkbox
-        self.Filters = QtGui.QLabel("Filters ")
+        self.EmptyText = QtGui.QLabel(" ")
         self.InputBoxNSecondText = QtGui.QLabel("sec")
         self.InputBoxThresholdText = QtGui.QLabel("Threshold")
         self.InputBoxFrequency1Text = QtGui.QLabel("Frequency 1")
         self.InputBoxFrequency2Text = QtGui.QLabel("Frequency 2")
-        self.InputBoxChannel1SensibilityText = QtGui.QLabel("Info Sensor \n Channel 1")
-        self.InputBoxChannel2SensibilityText = QtGui.QLabel("Info Sensor \n Channel 2")       
+        self.InputBoxChannel1SensibilityText = QtGui.QLabel("Info Sensor Channel 1")
+        self.InputBoxChannel2SensibilityText = QtGui.QLabel("Info Sensor Channel 2")       
                
 
         # add all the controls and text to the layout
-        self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)        
-        self.controlPanelLeftLayout.addWidget(self.StartRecording, 1, 0)
-        self.controlPanelLeftLayout.addWidget(self.StartNsec, 2, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 2, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecondText, 2, 2)
-        self.controlPanelLeftLayout.addWidget(self.StopRecording, 3, 0)
-        self.controlPanelLeftLayout.addWidget(self.Trigger, 4, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 4, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 4, 2)        
-        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 5, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 5, 1)        
-        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 6, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 6, 1)
-        self.controlPanelLeftLayout.addWidget(self.Filters, 7, 0)
+        self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)
+        self.controlPanelLeftLayout.addWidget(self.EmptyText, 1, 0)
+        self.controlPanelLeftLayout.addWidget(self.StartRecording, 2, 0)
+        self.controlPanelLeftLayout.addWidget(self.StartNsec, 3, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 3, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxNSecondText, 3, 2)
+        self.controlPanelLeftLayout.addWidget(self.StopRecording, 4, 0)
+        self.controlPanelLeftLayout.addWidget(self.Trigger, 5, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 5, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 5, 2)        
+        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 6, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 6, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 7, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 1)
         self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 8, 0)
         self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 8, 1)
         self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 8, 2)
@@ -517,7 +532,6 @@ class MainFrame(QMainWindow):
         self.StartNsec.setToolTip('Start recording the measure for a number of seconds specified. The record will automatically stop itself')
         self.StopRecording.setToolTip('Stop recording the measure')
         self.Trigger.setToolTip('Use the mode Trigger to automatically start recording for the threshold specified')
-        self.InputBoxThreshold.setToolTip(u'Indicate the value of the threshold in % of the value max known')
         self.checkboxOffset.setToolTip('Add an offset to the measure ')
         self.InputBoxOffset.setToolTip('Indicate the value of the constant value of the signal if it is known')
      
@@ -536,7 +550,8 @@ class MainFrame(QMainWindow):
         self.InputBoxChannel1Units.setToolTip('Indicate the units of the sensor used by the channel 1')
         self.InputBoxChannel2Sensibility.setToolTip('Indicate the value of the sensor used by the channel 2')
         self.InputBoxChannel2Units.setToolTip('Indicate the units of the sensor used by the channel 2')
-             
+        
+        
         
 
         #add text to all the buttons
@@ -549,11 +564,11 @@ class MainFrame(QMainWindow):
         self.checkboxDerivate.setText('Derivate')
         self.checkboxIntegrate.setText('Integrate')
 
-        self.checkboxAntiNoise.setText('AntiNoise')
-        self.checkboxLP.setText('Low Pass')
-        self.checkboxHP.setText('High Pass')
-        self.checkboxBP.setText('Band Pass')
-        self.checkboxCut.setText('Band Cut')   
+        self.checkboxAntiNoise.setText('AntiNoise Filter')
+        self.checkboxLP.setText('Low Pass Filter')
+        self.checkboxHP.setText('High Pass Filter')
+        self.checkboxBP.setText('Band Pass Filter')
+        self.checkboxCut.setText('Band Cut Filter')   
 
         
         # add all this stuff to the global interface
@@ -563,7 +578,7 @@ class MainFrame(QMainWindow):
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
 
         #put margins around the widget
-        self.controlPanelLeft.setContentsMargins( 0, 0, 0, 0)
+        self.controlPanelLeft.setContentsMargins( 0, 20, 0, 0)
 
         #add group button to make exclusive some of the checkbox
         self.GroupRecording = QtGui.QButtonGroup(self.controlPanelLeft)
@@ -581,27 +596,34 @@ class MainFrame(QMainWindow):
         self.connectGUI()
         
     def displaySignal(self):
-        """ Display signal in temporal and frequential form """
+        """
+        Display signal in temporal, frequential and recorded form 
+        /!\ Mono canal => [0]
+        
+        """
         
         #print "[Oh yeah, I display]" self.checkboxAntiNoise.isChecked() 
 
         # get the signal modified by option selected by the user
-        # a signal recorded is pure : the filters, anti-noise, ... treatement
+        # a recorded signal is pure : the filters, anti-noise, ... treatement
         # are visible (are displayed) but doesn't alter the signal recorded
 
         timeSignal = True # say if a signal is in a time format
-
-        rate = self.signalFrame.signalList[self.signalFrame.currentSignal].rate
         
+
+        rate = self.signalFrame.getCurrentSignal().rate
+        
+        # check how the user want to display the signal (filtered, pure, ...)
         if self.checkboxAntiNoise.isChecked() :
 
             # get the antinoise percentage and display the anti-noised signal
             noisePercent  = self.sliderAntiNoise.value()/100
             # self.sliderAntiNoise.value()
 
-            #print "[display] Anti-noise altered signal "+str(noisePercent)
+            print "[display] Anti-noise altered signal "+str(noisePercent)
             
-            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getAntiNoiseSignalPart(noisePercent)
+            dataToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignalPart(noisePercent)
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignal(noisePercent)[0]
 
             timeSignal = False
 
@@ -616,7 +638,8 @@ class MainFrame(QMainWindow):
             
             print "[display] HighPass filtered signal at "+str(wo)
             
-            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getHPFilteredSignalPart(wo)
+            dataToDisplay = self.signalFrame.getCurrentSignal().getHPFilteredSignalPart(wo)
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getHPFilteredSignal(wo)[0]
 
         elif self.checkboxLP.isChecked() :
 
@@ -629,14 +652,32 @@ class MainFrame(QMainWindow):
             
             print "[display] LowPass filtered signal at "+str(wo)
             
-            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLPFilteredSignalPart(wo)
+            dataToDisplay = self.signalFrame.getCurrentSignal().getLPFilteredSignalPart(wo)
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getLPFilteredSignal(wo)[0]
+        
+        elif self.checkboxBP.isChecked() :
+
+            # set the default value for the cutting frequency
+            try :
+                wo = float(self.InputBoxFrequency1.text())
+                w1 = float(self.InputBoxFrequency2.text())
+            except :
+                print "Rentrez une valeur valide nom de Zeus !"
+                wo = 0.0
+                w1 = 0.0
+            
+            print "[display] BandPass filtered signal at "+str(wo)+";"+str(w1)
+            
+            dataToDisplay = self.signalFrame.getCurrentSignal().getBPFilteredSignalPart(wo,w1)
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getBPFilteredSignal(wo,w1)[0]
             
         else :
             
             print "[display] Pure signal"
             
             # get the data to display
-            dataToDisplay = self.signalFrame.signalList[self.signalFrame.currentSignal].getLastSignalRecordedPart()
+            dataToDisplay = self.signalFrame.getCurrentSignal().getLastSignalRecordedPart()
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getWellFormattedTimeSignal()[0]
 
         # display the signal
         if timeSignal :
@@ -650,7 +691,11 @@ class MainFrame(QMainWindow):
             # display it by refresh plot values to display
             self.signalFrame.freqScope.update(dataToDisplay, rate)
             self.signalFrame.timeScope.update(Signal.getTimeSignalFromFreqSignal(dataToDisplay), rate)
-
+            
+        # update recorded signal diplay
+        # if recording, real time recorded signal display
+        if self.isRecording :      
+            self.recordedSignal.plot(recordedSignalToDisplay) 
 
              
     #
@@ -670,14 +715,16 @@ class MainFrame(QMainWindow):
         self.connect(self.controlButtonRate, Qt.SIGNAL("valueChanged(double)"), self.setRate)
         self.connect(self.controlButtonVerticalScale1, Qt.SIGNAL("valueChanged(double)"), self.setVerticalScale)
         self.connect(self.controlButtonVerticalScale2, Qt.SIGNAL("valueChanged(double)"), self.setVerticalScale)
-        self.connect(self.controlButtonHorizontalScale1, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
-        self.connect(self.controlButtonHorizontalScale2, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
+        self.connect(self.controlButtonHorizontalScale, Qt.SIGNAL("valueChanged(double)"), self.setHorizontalScale)
 
         # controls in the center of the application
         self.connect(self.StartRecording, QtCore.SIGNAL('clicked()'), self.startRecord)
         self.connect(self.StopRecording, QtCore.SIGNAL('clicked()'), self.stopRecording)
         self.connect(self.Trigger, QtCore.SIGNAL('clicked()'), self.launchTrigger)
-        self.connect(self.sliderAntiNoise, QtCore.SIGNAL('valueChanged(int)'), self.setAntiNoise)
+        self.connect(self.sliderAntiNoise, QtCore.SIGNAL('valueChanged(int)'), self.applyAntiNoiseRecordedSignal)
+        
+        # control for recorded signal
+        #self.connect(self.checkboxAntiNoise, QtCore.SIGNAL('clicked()'), self.applyAntiNoiseRecordedSignal)
 
     #
     # ------------------------------------------------------------------
@@ -686,6 +733,18 @@ class MainFrame(QMainWindow):
     #
     # ------------------------------------------------------------------
     #
+    
+    def applyAntiNoiseRecordedSignal(self):
+        
+        print "[Anti noise] "+str(self.sliderAntiNoise.value())
+        
+        if not(self.isRecording) and self.checkboxAntiNoise.isChecked():
+            
+            print "[Anti noise] Display new recorded Signal"
+            
+            noisePercent  = self.sliderAntiNoise.value()/100
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignal(noisePercent)[0]
+            self.recordedSignal.plot(recordedSignalToDisplay)
     
     def deleteCurrentSignal(self):
         self.signalFrame.deleteCurrentSignal()
@@ -819,6 +878,8 @@ class MainFrame(QMainWindow):
         print "[Start recording] Allez ça part !"
         self.infoAction.setText("[Recording] Allez ça part !")
         
+        self.isRecording = True
+        
         # restart current signal acquisition
         self.signalFrame.getCurrentSignal().threadsDieNow = False
         
@@ -836,6 +897,8 @@ class MainFrame(QMainWindow):
     def stopRecording(self):
 
         self.infoAction.setText("None")
+        
+        self.isRecording = False
 
         # stop all recording process
         print "[Stop recording]"
@@ -892,10 +955,11 @@ def main(args):
     SCOPE.setToolBar()
     
     # set the graphical elements of the interface
-    #f.resize(1400,700)
+    #SCOPE.setSize(400,400)
     SCOPE.setSignalInformation()
     SCOPE.setScopes()
     SCOPE.setRecordedSignalDisplay()
+    
     SCOPE.setControlPanelRight()
     SCOPE.setControlPanelLeft()
     

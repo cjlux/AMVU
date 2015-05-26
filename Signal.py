@@ -52,8 +52,9 @@ class Signal():
         print "[New signal] Size "+str(size)+", rate "+str(rate)
         
         # state of recording
-        self.threadsDieNow  = False
-        self.newAudio       = False
+        self.threadsDieNow        = False
+        self.stopRecordingSignal  = False
+        self.newAudio             = False
         
         # processus used to record signal
         self.recordingProcess = None
@@ -96,6 +97,8 @@ class Signal():
         Start to record signal parts in timeSignal for time second if time is given
         """
         print "[Start recording]"
+        
+        self.stopRecordingSignal = False
         
         self.recordingProcess = Thread(target=self.record)
         self.recordingProcess.start()
@@ -157,8 +160,6 @@ class Signal():
 
         print "[Trigger] end of the function"
 
-        
-            
     #
     # TODO : need to optimize
     #
@@ -191,7 +192,7 @@ class Signal():
     
     def stopRecording(self):
         """ Stop any recording currently running """
-        self.threadsDieNow = True
+        self.stopRecordingSignal = True
     
     def stopDisplaying(self):
         """ Stop any displaying currently running """
@@ -206,7 +207,6 @@ class Signal():
         self.stopSignalStream()
         #self.closeSignalStream()
     
-        
     def getLastSignalRecordedPart(self):
         """
         Return the last recorded signal part
@@ -219,6 +219,16 @@ class Signal():
         # format the last recorded signal part and give it back
         return Signal.getWellFormatedSignal(self.signalPart, self.channel)
     
+    def getTimeSignal(self):
+        # x represent all the recorded time signal 
+        x = numpy.empty(len(self.timeSignal)*self.size*self.channel,dtype=numpy.int16)
+       
+        # fill in x with signal values
+        for i in range(len(self.timeSignal)):
+            x[i*self.size*self.channel:(i+1)*self.size*self.channel] = self.timeSignal[i][0:self.size*self.channel] 
+        
+        return x
+        
     def getWellFormattedTimeSignal(self):
         """
         Return time signal on an adapted form to display it
@@ -229,15 +239,21 @@ class Signal():
         """
 
         # x represent all the recorded time signal 
-        x = numpy.empty(len(self.timeSignal)*self.size*self.channel,dtype=numpy.int16)
-       
-        # fill in x with signal values
-        for i in range(len(self.timeSignal)):
-            x[i*self.size*self.channel:(i+1)*self.size*self.channel] = self.timeSignal[i][0:self.size*self.channel] 
+        x = self.getTimeSignal()
         
         # format x and give it back
         return Signal.getWellFormatedSignal(x, self.channel)
     
+    def getFreqSignal(self):
+        # x represent all the recorded frequential signal 
+        x = numpy.empty(len(self.frequentialSignal)*self.size*self.channel,dtype=numpy.int16)
+       
+        # fill in x with signal values
+        for i in range(len(self.frequentialSignal)):
+            x[i*self.size*self.channel:(i+1)*self.size*self.channel] = self.frequentialSignal[i][0:self.size*self.channel] 
+        
+        return x
+        
     def getWellFormattedFreqSignal(self):
         """
         Return frequential signal on an adapted form to display it
@@ -248,11 +264,7 @@ class Signal():
         """
         
         # x represent all the recorded frequential signal 
-        x = numpy.empty(len(self.frequentialSignal)*self.size*self.channel,dtype=numpy.int16)
-       
-        # fill in x with signal values
-        for i in range(len(self.frequentialSignal)):
-            x[i*self.size*self.channel:(i+1)*self.size*self.channel] = self.frequentialSignal[i][0:self.size*self.channel] 
+        x = self.getFreqSignal()
         
         # format x and give it back
         return Signal.getWellFormatedSignal(x, self.channel)
@@ -262,32 +274,48 @@ class Signal():
     #    
     def getBPFilteredSignalPart(self, w0, w1):
         """
-        Return band pass filtered frequential signal in a new signal object
+        Return a band pass filtered signalPart, in time form
         w0 and w1 stand for the cutoff frequencies.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
         * If channel number is n>2 : it will probably explode
         """
         
+        freqSignalPart = Signal.getFreqSignalFromTimeSignal(self.signalPart)
+        timeSignalPart = self.signalPart.copy()
+        
         # filtering signalParts
+        for k in range(len(freqSignalPart)):
+            if w0>freqSignalPart[k] or freqSignalPart[k]>w1 :
+                timeSignalPart[k]=0
         
-        # [...]
-        # Filtering stuff
-        # [...]
-        #filteredSignalParts = numpy.array(...)
+        return Signal.getWellFormatedSignal(timeSignalPart, self.channel)
         
-        # create a new signal object containing the filtered signal result
-        filteredSignal = Signal(self.rate, self.size, self.format, self.channel)
-        filteredSignal.setTimeSignal(filteredSignalParts)
+    def getBPFilteredSignal(self, w0, w1):
+        """
+        Return a band pass filtered signal, in time form
+        w0 and w1 stand for the cutoff frequencies.
+        * If channel number is 1   : an array of an array containing the signal values is returned
+        * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
+        * If channel number is n>2 : it will probably explode
+        """
         
-        return filteredSignal
-    
+        timeSignalTmp = Sself.getTimeSignal()
+        freqSignalTmp = getTimeSignalFromFreqSignal(timeSignalTmp)
+        
+        # filtering signalParts
+        for k in range(len(freqSignalTmp)):
+            if w0>freqSignalTmp[k] or freqSignalTmp[k]>w1 :
+                timeSignalTmp[k]=0
+        
+        return timeSignalTmp
+        
     #
     # = Under development ================
     #
     def getLPFilteredSignalPart(self, wo):
         """
-        Return low pass filtered frequential signal in a new signal object
+        Return a low pass filtered signalPart, in time form
         w0 stands for the cutoff frequency.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
@@ -302,13 +330,31 @@ class Signal():
                 timeSignalPart[k]=0   #Values outside filter's range =0
         
         return Signal.getWellFormatedSignal(timeSignalPart, self.channel)
+        
+    def getLPFilteredSignal(self, wo):
+        """
+        Return a low pass filtered signal, in time form
+        w0 stands for the cutoff frequency.
+        * If channel number is 1   : an array of an array containing the signal values is returned
+        * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
+        * If channel number is n>2 : it will probably explode
+        """
+
+        timeSignalTmp = self.getTimeSignal()
+        freqSignalTmp = Signal.getTimeSignalFromFreqSignal(timeSignalTmp)
+        
+        for k in range(len(freqSignalTmp)):
+            if freqSignalTmp[k]>wo :   #Filter definition
+                timeSignalTmp[k]=0   #Values outside filter's range =0
+        
+        return Signal.getWellFormatedSignal(timeSignalTmp, self.channel)
     
     #
     # = Under development ================
     #
     def getHPFilteredSignalPart(self, wo):
         """
-        Return high pass filtered filtered signal in a new signal object
+        Return a high pass filtered signalPart, in time form
         w0 stands for the cutoff frequency.
         * If channel number is 1   : an array of an array containing the signal values is returned
         * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
@@ -324,11 +370,30 @@ class Signal():
                 timeSignalPart[k]=0
 
         return Signal.getWellFormatedSignal(timeSignalPart, self.channel)
+        
+    def getHPFilteredSignal(self, wo):
+        """
+        Return a high pass filtered signal, in time form
+        w0 stands for the cutoff frequency.
+        * If channel number is 1   : an array of an array containing the signal values is returned
+        * If channel number is 2   : an array of two arrays containing each one a channel signal values is returned
+        * If channel number is n>2 : it will probably explode
+        """
+        
+        # filtering signalParts
+        timeSignalTmp = self.self.getTimeSignal()
+        freqSignalTmp = Signal.getTimeSignalFromFreqSignal(timeSignalTmp)
+
+        for k in range(len(freqSignalTmp)):
+            if freqSignalTmp[k]<wo :   
+                timeSignalTmp[k]=0
+
+        return Signal.getWellFormatedSignal(timeSignalTmp, self.channel)        
 
     def getAntiNoiseSignalPart(self, noisePercent) :
         """
         Return a noise free signalPart, in frequential form
-        NoisePercent is percentage of noise filtered
+        noisePercent is percentage of noise filtered
         """
         Amax = 0
         freqSignalPart = Signal.getFreqSignalFromTimeSignal(self.signalPart)
@@ -342,6 +407,33 @@ class Signal():
         
         return Signal.getWellFormatedSignal(freqSignalPart, self.channel)   
         
+    def getAntiNoiseSignal(self, noisePercent) :
+        """
+        Return a noise free signal, in frequential form
+        noisePercent is percentage of noise filtered
+        """
+        Amax = 0
+
+        freqSignalTmp = Signal.getFreqSignalFromTimeSignal(self.getTimeSignal())
+        
+        for k in range(len(freqSignalTmp)) :
+            if freqSignalTmp[k] > Amax :
+                Amax = freqSignalTmp[k]         #Research of FFT's max value
+
+        for k in range(len(freqSignalTmp)):
+            if freqSignalTmp[k] < noisePercent*Amax :   
+                freqSignalTmp[k] = 0
+        
+        #print "get time signal : "+str(self.getTimeSignal())
+        #print "get WF time signal : "+str(self.getWellFormattedTimeSignal())
+        #print "function result : "+str(Signal.getWellFormatedSignal(freqSignalTmp, self.channel))
+        
+        #return self.getWellFormattedTimeSignal()
+        
+        return Signal.getWellFormatedSignal(freqSignalTmp, self.channel)
+        
+        
+         
         
     #
     # = Under development ================
@@ -479,7 +571,7 @@ class Signal():
         """ Record a sample of audio."""
         
         # daemon recording as fast as it can the data from the sound card
-        while not(self.threadsDieNow):
+        while not(self.stopRecordingSignal):
             
             # all the readings from the sound card are recorder as signal portions
             self.signalPart[0:self.size*self.channel] = self.readSignal(self.size)
