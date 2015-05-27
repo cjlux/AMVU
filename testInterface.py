@@ -221,7 +221,7 @@ class MainFrame(QMainWindow):
         # set the tab widget hosting each graph tab
         self.signalGraph = QTabWidget(self) 
         self.signalGraph.addTab(self.timeGraphTab,"Time")
-        self.signalGraph.addTab(self.freqGraphTab,"Freq")
+        self.signalGraph.addTab(self.freqGraphTab,"Frequency")
         self.signalGraph.addTab(self.recordedSignalTab,"Recorded signal")
         
         # add the graph tab to the global interface
@@ -252,15 +252,6 @@ class MainFrame(QMainWindow):
         btnSave.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         toolBar.addWidget(btnSave)
 ##        self.connect(btnQuit,QtCore.SIGNAL('clicked()'),QtCore.SLOT('close()'))
-
-##        self.btnPause = Qt.QToolButton(toolBar)
-##        self.btnPause.setText("Pause")
-##        self.btnPause.setToolTip('Pauses the acquisition...')
-##        self.btnPause.setIcon(Qt.QIcon("pause"))
-##        self.btnPause.setCheckable(True)
-##        self.btnPause.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
-##        toolBar.addWidget(self.btnPause)
-##        #self.connect(self.btnPause,Qt.SIGNAL('toggled(bool)'),self.Pause)
 
         btnPDF = Qt.QToolButton(toolBar)
         btnPDF.setText("PDF")
@@ -343,12 +334,12 @@ class MainFrame(QMainWindow):
     def setSignalInformation(self):
         
         # create a label to display information
-        self.informationLabel1 = QtGui.QLabel(u"Amplitude : mv")
-        self.informationLabel2 = QtGui.QLabel(u"Valeur crète à crète: rad/s")
-        self.informationLabel3 = QtGui.QLabel(u"Temps d'enregistrement : s")
-        self.informationLabel4 = QtGui.QLabel(u"Déphasage : rad/s")
+        self.informationLabel1 = QtGui.QLabel(u"Amplitude : [V]")
+        self.informationLabel2 = QtGui.QLabel(u"Peak to peak Value: [V]")
+        self.informationLabel3 = QtGui.QLabel(u"Recording time : [sec]")
+        self.informationLabel4 = QtGui.QLabel(u"Phase shift : [rad]")
 
-        self.infoAction = QtGui.QLineEdit("Action en cours : ",self)
+        self.infoAction = QtGui.QLineEdit("Current action : ",self)
         self.infoAction.isReadOnly()
         self.infoAction.setText("None")
         
@@ -485,7 +476,9 @@ class MainFrame(QMainWindow):
 
                 
         #create label with the text of the inputbox as a Widget to be put in the grid above the checkbox
-        self.EmptyText = QtGui.QLabel(" ")
+        self.EmptyText1 = QtGui.QLabel("Recording controls")
+        self.EmptyText2 = QtGui.QLabel("Optionnal controls")
+        self.EmptyText3 = QtGui.QLabel("Sensor Information")
         self.InputBoxNSecondText = QtGui.QLabel("sec")
         self.InputBoxThresholdText = QtGui.QLabel("Threshold")
         self.InputBoxFrequency1Text = QtGui.QLabel("Frequency 1")
@@ -493,11 +486,11 @@ class MainFrame(QMainWindow):
         self.InputBoxChannel1SensibilityText = QtGui.QLabel("Info Sensor Channel 1")
         self.InputBoxChannel2SensibilityText = QtGui.QLabel("Info Sensor Channel 2")       
                
-
+                
         # add all the controls and text to the layout
         self.controlPanelLeftLayout.addWidget(self.razButton,0,1)
         self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)
-        self.controlPanelLeftLayout.addWidget(self.EmptyText, 1, 0)
+        self.controlPanelLeftLayout.addWidget(self.EmptyText1, 1, 0)
         self.controlPanelLeftLayout.addWidget(self.StartRecording, 2, 0)
         self.controlPanelLeftLayout.addWidget(self.StartNsec, 3, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxNSecond, 3, 1)
@@ -505,28 +498,30 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.StopRecording, 4, 0)
         self.controlPanelLeftLayout.addWidget(self.Trigger, 5, 0)
         self.controlPanelLeftLayout.addWidget(self.InputBoxThreshold, 5, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 5, 2)        
-        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 6, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 6, 1)
-        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 7, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 7, 1)
-        self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 8, 0)
-        self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 8, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 8, 2)
-        self.controlPanelLeftLayout.addWidget(self.checkboxLP, 9, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxHP, 9, 1)
-        self.controlPanelLeftLayout.addWidget(self.checkboxBP, 10, 0)
-        self.controlPanelLeftLayout.addWidget(self.checkboxCut, 10, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1Text, 11, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1, 11, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2Text, 12, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2, 12, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel1Sensibility, 14, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel1Units, 14, 2)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel1SensibilityText, 14, 0)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel2Sensibility, 15, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel2Units, 15, 2)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel2SensibilityText, 15, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxThresholdText, 5, 2)
+        self.controlPanelLeftLayout.addWidget(self.EmptyText2, 6, 0)        
+        self.controlPanelLeftLayout.addWidget(self.checkboxOffset, 7, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxOffset, 7, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxDerivate, 8, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 8, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 9, 0)
+        self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 9, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 9, 2)
+        self.controlPanelLeftLayout.addWidget(self.checkboxLP, 10, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxHP, 10, 1)
+        self.controlPanelLeftLayout.addWidget(self.checkboxBP, 11, 0)
+        self.controlPanelLeftLayout.addWidget(self.checkboxCut, 11, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1Text, 12, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency1, 12, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2Text, 13, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxFrequency2, 13, 1)
+        self.controlPanelLeftLayout.addWidget(self.EmptyText3, 14, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel1Sensibility, 15, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel1Units, 15, 2)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel1SensibilityText, 15, 0)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel2Sensibility, 16, 1)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel2Units, 16, 2)
+        self.controlPanelLeftLayout.addWidget(self.InputBoxChannel2SensibilityText, 16, 0)
         
 
         # add tooltips on each button
@@ -581,7 +576,7 @@ class MainFrame(QMainWindow):
         self.globalInterfaceCenterLayout.addWidget(self.controlPanelLeft, 0, 0)
 
         #put margins around the widget
-        self.controlPanelLeft.setContentsMargins( 0, 20, 0, 0)
+        self.controlPanelLeft.setContentsMargins( 0, 0, 0, 0)
 
         #add group button to make exclusive some of the checkbox
         self.GroupRecording = QtGui.QButtonGroup(self.controlPanelLeft)
@@ -632,7 +627,8 @@ class MainFrame(QMainWindow):
             try :
                 wo = float(self.InputBoxFrequency1.text())
             except :
-                print "Rentrez une valeur valide nom de Zeus !"
+                print "That's not a valid value! Try again"
+                self.infoAction.setText("Tuck a valid value")
                 wo = 0.0
             
             print "[display] HighPass filtered signal at "+str(wo)
@@ -646,7 +642,8 @@ class MainFrame(QMainWindow):
             try :
                 wo = float(self.InputBoxFrequency1.text())
             except :
-                print "Rentrez une valeur valide nom de Zeus !"
+                print "That's not a valid value! Try again"
+                self.infoAction.setText("Tuck a valid value")
                 wo = 0.0
             
             print "[display] LowPass filtered signal at "+str(wo)
@@ -661,7 +658,8 @@ class MainFrame(QMainWindow):
                 wo = float(self.InputBoxFrequency1.text())
                 w1 = float(self.InputBoxFrequency2.text())
             except :
-                print "Rentrez une valeur valide nom de Zeus !"
+                print "That's not a valid value! Try again"
+                self.infoAction.setText("Tuck a valid value")
                 wo = 0.0
                 w1 = 0.0
             
@@ -861,7 +859,8 @@ class MainFrame(QMainWindow):
         try :
             triggerStep = float(self.InputBoxThreshold.text())
         except :
-            print "Rentrez une valeur valide nom de Zeus"
+            print "That's not a valid value! Try again"
+            self.infoAction.setText("Tuck a valid value")
             triggerStep = 0.0
 
         print "[Launch trigger] : "+str(triggerStep)
@@ -870,7 +869,8 @@ class MainFrame(QMainWindow):
         if triggerStep > 0.0 :
             self.signalFrame.getCurrentSignal().startTrigger(triggerStep, 4)
         else :
-            print "wowowo, on se calme, y'a pas de valeur dans l'inputbox là"
+            print "Calm down, you have to tuck a f*cking value for the trigger to run"
+            self.infoAction.setText("Please enter a value in the trigger inputbox")
     
     def exportFile(self):
         
@@ -895,8 +895,8 @@ class MainFrame(QMainWindow):
 
     def startRecord(self):
 
-        print "[Start recording] Allez ça part !"
-        self.infoAction.setText("[Recording] Allez ça part !")
+        print "[Start recording] Here we go"
+        self.infoAction.setText("Beginning of the recording")
         
         self.isRecording = True
         

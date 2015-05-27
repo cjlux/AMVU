@@ -304,7 +304,7 @@ class Signal():
         * If channel number is n>2 : it will probably explode
         """
         
-        timeSignalTmp = Sself.getTimeSignal()
+        timeSignalTmp = self.getTimeSignal()
         freqSignalTmp = getTimeSignalFromFreqSignal(timeSignalTmp)
         
         # filtering signalParts
