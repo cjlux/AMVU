@@ -456,6 +456,8 @@ class MainFrame(QMainWindow):
         self.channelButton.insertItem(1,"Channel 1")
         self.channelButton.insertItem(2,"Channel 2")        
         
+        self.razButton = QtGui.QPushButton("RAZ", self)
+        
         self.StartRecording = QtGui.QPushButton("Start",self)
         self.StartNsec = QtGui.QPushButton("",self)
         self.StopRecording = QtGui.QPushButton("Stop",self)        
@@ -493,6 +495,7 @@ class MainFrame(QMainWindow):
                
 
         # add all the controls and text to the layout
+        self.controlPanelLeftLayout.addWidget(self.razButton,0,1)
         self.controlPanelLeftLayout.addWidget(self.channelButton, 0, 0)
         self.controlPanelLeftLayout.addWidget(self.EmptyText, 1, 0)
         self.controlPanelLeftLayout.addWidget(self.StartRecording, 2, 0)
@@ -607,8 +610,6 @@ class MainFrame(QMainWindow):
         # get the signal modified by option selected by the user
         # a recorded signal is pure : the filters, anti-noise, ... treatement
         # are visible (are displayed) but doesn't alter the signal recorded
-
-        timeSignal = True # say if a signal is in a time format
         
 
         rate = self.signalFrame.getCurrentSignal().rate
@@ -624,8 +625,6 @@ class MainFrame(QMainWindow):
             
             dataToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignalPart(noisePercent)
             recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignal(noisePercent)[0]
-
-            timeSignal = False
 
         elif self.checkboxHP.isChecked() :
 
@@ -678,24 +677,15 @@ class MainFrame(QMainWindow):
             # get the data to display
             dataToDisplay = self.signalFrame.getCurrentSignal().getLastSignalRecordedPart()
             recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getWellFormattedTimeSignal()[0]
-
-        # display the signal
-        if timeSignal :
             
-            # display it by refresh plot values to display
-            self.signalFrame.timeScope.update(dataToDisplay, rate)
-            self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
-
-        else :
-            
-            # display it by refresh plot values to display
-            self.signalFrame.freqScope.update(dataToDisplay, rate)
-            self.signalFrame.timeScope.update(Signal.getTimeSignalFromFreqSignal(dataToDisplay), rate)
+        # display it by refresh plot values to display
+        self.signalFrame.timeScope.update(dataToDisplay, rate)
+        self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
             
         # update recorded signal diplay
         # if recording, real time recorded signal display
-        if self.isRecording :      
-            self.recordedSignal.plot(recordedSignalToDisplay) 
+        #if self.isRecording :      
+        self.recordedSignal.plot(recordedSignalToDisplay, clear=True) 
 
              
     #
@@ -721,7 +711,11 @@ class MainFrame(QMainWindow):
         self.connect(self.StartRecording, QtCore.SIGNAL('clicked()'), self.startRecord)
         self.connect(self.StopRecording, QtCore.SIGNAL('clicked()'), self.stopRecording)
         self.connect(self.Trigger, QtCore.SIGNAL('clicked()'), self.launchTrigger)
-        self.connect(self.sliderAntiNoise, QtCore.SIGNAL('valueChanged(int)'), self.applyAntiNoiseRecordedSignal)
+        self.connect(self.StartNsec, QtCore.SIGNAL('clicked()'), self.startRecordNsec)
+        self.connect(self.razButton, QtCore.SIGNAL('clicked()'), self.deleteCurrentSignal)     
+        
+        # control for recorded signal
+        #self.connect(self.sliderAntiNoise, QtCore.SIGNAL('valueChanged(int)'), self.applyAntiNoiseRecordedSignal)
         
         # control for recorded signal
         #self.connect(self.checkboxAntiNoise, QtCore.SIGNAL('clicked()'), self.applyAntiNoiseRecordedSignal)
@@ -733,22 +727,6 @@ class MainFrame(QMainWindow):
     #
     # ------------------------------------------------------------------
     #
-    
-    def applyAntiNoiseRecordedSignal(self):
-        
-        print "[Anti noise] "+str(self.sliderAntiNoise.value())
-        
-        if not(self.isRecording) and self.checkboxAntiNoise.isChecked():
-            
-            print "[Anti noise] Display new recorded Signal"
-            
-            noisePercent  = self.sliderAntiNoise.value()/100
-            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignal(noisePercent)[0]
-            self.recordedSignal.plot(recordedSignalToDisplay)
-    
-    def deleteCurrentSignal(self):
-        self.signalFrame.deleteCurrentSignal()
-    
     def setSize(self, newSize):
         print "[newSize] "+str(newSize)
         
@@ -801,6 +779,56 @@ class MainFrame(QMainWindow):
     #
     # ==================================================================
     #
+    def deleteCurrentSignal(self):
+        self.signalFrame.deleteCurrentSignal()
+        
+    def applyAntiNoiseRecordedSignal(self):
+        
+        print "[Anti noise] "+str(self.sliderAntiNoise.value())
+        
+        if not(self.isRecording) and self.checkboxAntiNoise.isChecked():
+            
+            print "[Anti noise] Display new recorded Signal"
+            
+            noisePercent  = self.sliderAntiNoise.value()/100
+            recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignal(noisePercent)[0]
+            self.recordedSignal.plot(recordedSignalToDisplay, clear=True)
+       
+    def startRecordNsec(self):
+        
+        # set the default value for the trigger
+        try :
+            time = float(self.InputBoxNSecond.text())
+        except :
+            print "Rentrez une valeur valide nom de Zeus"
+            time = -1
+            
+        if time >= 0 :
+        
+            print "[Start recording N sec] Allez ça part pour "+str(time)+" s !"
+            self.infoAction.setText("[Recording N sec] Allez ça part "+str(time)+" s !")
+            
+            self.isRecording = True
+            
+            # restart current signal acquisition
+            self.signalFrame.getCurrentSignal().threadsDieNow = False
+            
+            # restart signal recording
+            self.signalFrame.getCurrentSignal().startRecording(time) # signal SR = current sound card record
+                                # at any time
+            #SR.startTrigger()
+            
+            # display continuous signal
+            timer = QtCore.QTimer()
+            timer.start(1.0)
+            self.connect(timer, QtCore.SIGNAL('timeout()'), self.updateDisplay)
+            
+        else :
+            # ELSE : negative time is too much for AMVU
+            print "[Negative time] Boom, explosion"
+            
+        self.infoAction.setText("None")
+    
     def updateDisplay(self):
         
         #print "[Oh yeah, I update]"
@@ -847,14 +875,6 @@ class MainFrame(QMainWindow):
     def exportFile(self):
         
         self.signalFrame.getCurrentSignal().exportWavFormat()
-    
-    
-    
-
-
-#
-# ====================================================
-#
 
     def startRealTimeSignalDisplay(self):
         

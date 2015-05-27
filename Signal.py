@@ -96,7 +96,7 @@ class Signal():
         """
         Start to record signal parts in timeSignal for time second if time is given
         """
-        print "[Start recording]"
+        print "[Signal] Start recording"
         
         self.stopRecordingSignal = False
         
@@ -192,6 +192,7 @@ class Signal():
     
     def stopRecording(self):
         """ Stop any recording currently running """
+        print "[Signal] Stop recording"
         self.stopRecordingSignal = True
     
     def stopDisplaying(self):
@@ -207,6 +208,9 @@ class Signal():
         self.stopSignalStream()
         #self.closeSignalStream()
     
+    #
+    # UN SIGNAL TRAITE DOIT ETRE RENVOYE SOUS SA FORME TEMPORELLE
+    #
     def getLastSignalRecordedPart(self):
         """
         Return the last recorded signal part
@@ -405,7 +409,7 @@ class Signal():
             if freqSignalPart[k] < noisePercent*Amax :   
                 freqSignalPart[k] = 0
         
-        return Signal.getWellFormatedSignal(freqSignalPart, self.channel)   
+        return Signal.getWellFormatedSignal(Signal.getTimeSignalFromFreqSignal(freqSignalPart), self.channel)   
         
     def getAntiNoiseSignal(self, noisePercent) :
         """
@@ -430,7 +434,7 @@ class Signal():
         
         #return self.getWellFormattedTimeSignal()
         
-        return Signal.getWellFormatedSignal(freqSignalTmp, self.channel)
+        return Signal.getWellFormatedSignal(Signal.getTimeSignalFromFreqSignal(freqSignalTmp), self.channel)
         
         
          
