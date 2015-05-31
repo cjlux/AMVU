@@ -339,6 +339,8 @@ class MainFrame(QMainWindow):
         self.informationLabel3 = QtGui.QLabel(u"Recording time : [sec]")
         self.informationLabel4 = QtGui.QLabel(u"Phase shift : [rad]")
 
+        '''Do not forget to make the QLineEdit for each informationLabel'''
+
         self.infoAction = QtGui.QLineEdit("Current action : ",self)
         self.infoAction.isReadOnly()
         self.infoAction.setText("None")
@@ -352,7 +354,7 @@ class MainFrame(QMainWindow):
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
 
         #set the infoAction box on the signalInformationLayout
-        self.signalInformationLayout.addWidget(self.infoAction, 3, 1)
+        self.signalInformationLayout.addWidget(self.infoAction, 3, 3)
 
                 
         self.signalInformation = QWidget()
