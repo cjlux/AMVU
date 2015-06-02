@@ -46,7 +46,7 @@ class Signal():
         """
         Open a stream from the sound card
         /!\ All the attributes are public for the moment
-        If you want to access them without setters or getters, be careful
+        If you want to access them without setters or getters, be carefull
         """
         
         print "[New signal] Size "+str(size)+", rate "+str(rate)
@@ -55,6 +55,7 @@ class Signal():
         self.threadsDieNow        = False
         self.stopRecordingSignal  = False
         self.newAudio             = False
+        self.hasStartedRecording  = False
         
         # processus used to record signal
         self.recordingProcess = None
@@ -82,6 +83,9 @@ class Signal():
         # time signal under its frequential form
         self.frequentialSignal  = []
         
+        # recording time
+        self.recordingTime = 0
+        
     def setTimeSignal(self, newTimeSignal):
         """ set the time and frequential signal from a new time signal"""
         self.timeSignal = newTimeSignal
@@ -99,6 +103,9 @@ class Signal():
         print "[Signal] Start recording"
         
         self.stopRecordingSignal = False
+        self.hasStartedRecording = True
+        
+        self.startRecordingTime = t.time()
         
         self.recordingProcess = Thread(target=self.record)
         self.recordingProcess.start()
@@ -194,6 +201,9 @@ class Signal():
         """ Stop any recording currently running """
         print "[Signal] Stop recording"
         self.stopRecordingSignal = True
+        self.hasStartedRecording = False
+        self.stopRecordingTime   = t.time()
+        self.recordingTime       += (self.stopRecordingTime - self.startRecordingTime)
     
     def stopDisplaying(self):
         """ Stop any displaying currently running """
@@ -205,7 +215,11 @@ class Signal():
         """
         self.threadsDieNow = True
         
-        self.stopSignalStream()
+        try :
+            self.stopSignalStream()
+            self.soundCardLink.terminate()
+        except e :
+            print "Memory explosion due to huge level of reccursion"
         #self.closeSignalStream()
     
     #
@@ -475,6 +489,7 @@ class Signal():
     def stopSignalStream(self):
         """ Stop the stream used for the current signal """
         self.soundCardStream.stop_stream()
+        self.soundCardStream.close()
         
     # Not usefull with pyaudio ?
     #def closeSignalStream(self):
@@ -625,6 +640,61 @@ class Signal():
             t.sleep(time)
             self.stopRecording()
             
+    
+    def getAmplitudeMax(self) : 
+        """ 
+        Return the maximal amplitude of all sinus in the current signal.
+        This method doesn't apply to the recorded signal, it's just working
+        for real time signal information.
+        """
+        Amax = 0
+
+        freqSignalTmp = Signal.getFreqSignalFromTimeSignal(self.getTimeSignal())
+        
+        for k in range(len(freqSignalTmp)) :
+            if freqSignalTmp[k] > Amax :
+                Amax = freqSignalTmp[k]             
+        
+        return Amax
+        
+    def getPeakToPeak(self) :
+        """ 
+        Return the peak to peak value of the signal with the maximal amplitude
+        This method doesn't apply to the recorded signal, it's just working
+        for real time signal information.
+        """
+        Amax = 0
+        Amin = 0
+        
+        signalPart = self.signalPart.copy()
+        
+        for k in range(len(signalPart)) :
+            if signalPart[k] > Amax :
+                Amax = signalPart[k]         
+
+        for k in range(len(signalPart)) :
+            if signalPart[k] < Amin :
+                Amin = signalPart[k] 
+        
+        return Amax - Amin
+        
+    def getRecordingTime(self) :
+        """ 
+        Return the recording time
+        This method doesn't apply to the recorded signal, it's just working
+        for real time signal information.
+        """
+        tmpRecordingTime = 0
+        
+        if self.hasStartedRecording :
+            # the signal is still recording
+            self.stopRecordingTime = t.time()
+            tmpRecordingTime     = (self.stopRecordingTime - self.startRecordingTime)
+        
+        return int(self.recordingTime + tmpRecordingTime)
+        
+    def getPhaseShift(self) :
+        return 0
 
     
     

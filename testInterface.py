@@ -56,6 +56,8 @@ class MainFrame(QMainWindow):
         self.btnPause   = None
         self.grid       = None
         
+        self.selectedChannel = 3 # default, channel 1+2 selected
+        
         #
         # Interface elements (widgets) 
         #
@@ -334,28 +336,10 @@ class MainFrame(QMainWindow):
     def setSignalInformation(self):
         
         # create a label to display information
-        self.informationLabel1 = QtGui.QLabel(u"Amplitude :")
-        self.informationLabel10 = QtGui.QLabel("[V]")        
-        self.informationLabel2 = QtGui.QLabel(u"Peak to peak Value:")
-        self.informationLabel20 = QtGui.QLabel("[V]")
-        self.informationLabel3 = QtGui.QLabel(u"Recording time :")
-        self.informationLabel30 = QtGui.QLabel("[sec]")
-        self.informationLabel4 = QtGui.QLabel(u"Phase shift :")
-        self.informationLabel40 = QtGui.QLabel("[rad]")
-
-        self.infoLabel1 = QtGui.QLineEdit(self)
-        self.infoLabel1.isReadOnly()
-        self.infoLabel1.setText("None")
-        self.infoLabel2 = QtGui.QLineEdit(self)
-        self.infoLabel2.isReadOnly()
-        self.infoLabel2.setText("None")
-        self.infoLabel3 = QtGui.QLineEdit(self)
-        self.infoLabel3.isReadOnly()
-        self.infoLabel3.setText("None")
-        self.infoLabel4 = QtGui.QLineEdit(self)
-        self.infoLabel4.isReadOnly()
-        self.infoLabel4.setText("None")
-        
+        self.informationLabel1 = QtGui.QLabel(u"Amplitude max : [V]")
+        self.informationLabel2 = QtGui.QLabel(u"Peak to peak Value: [V]")
+        self.informationLabel3 = QtGui.QLabel(u"Recording time : [sec]")
+        self.informationLabel4 = QtGui.QLabel(u"Phase shift : [rad]")
 
         '''Do not forget to make the QLineEdit for each informationLabel'''
 
@@ -367,17 +351,9 @@ class MainFrame(QMainWindow):
         # add this label to the global interface
         self.signalInformationLayout = QtGui.QGridLayout()
         self.signalInformationLayout.addWidget(self.informationLabel1, 0, 0)
-        self.signalInformationLayout.addWidget(self.infoLabel1, 0, 1)
-        self.signalInformationLayout.addWidget(self.informationLabel10, 0, 2)        
         self.signalInformationLayout.addWidget(self.informationLabel2, 1, 0)
-        self.signalInformationLayout.addWidget(self.infoLabel2, 1, 1)
-        self.signalInformationLayout.addWidget(self.informationLabel20, 1, 2)
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
-        self.signalInformationLayout.addWidget(self.infoLabel3, 2, 1)
-        self.signalInformationLayout.addWidget(self.informationLabel30, 2, 2)
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
-        self.signalInformationLayout.addWidget(self.infoLabel4, 3, 1)
-        self.signalInformationLayout.addWidget(self.informationLabel40, 3, 2)
 
         #set the infoAction box on the signalInformationLayout
         self.signalInformationLayout.addWidget(self.infoAction, 3, 3)
@@ -404,12 +380,12 @@ class MainFrame(QMainWindow):
         self.controlButtonHorizontalScale.setTotalAngle(270)
         
         # set propreties for this controls
-        self.controlButtonVerticalScale1.setScale(0, 1, 0.2)
-        self.controlButtonVerticalScale1.setRange(0, 1)
-        self.controlButtonVerticalScale2.setScale(0, 1, 0.2)
-        self.controlButtonVerticalScale2.setRange(0, 1)
-        self.controlButtonHorizontalScale.setScale(0, 0.5, 0.1)
-        self.controlButtonHorizontalScale.setRange(0, 0.5)
+        self.controlButtonVerticalScale1.setScale(0.1, 1, 0.2)
+        self.controlButtonVerticalScale1.setRange(0.1, 1)
+        self.controlButtonVerticalScale2.setScale(0.1, 1, 0.2)
+        self.controlButtonVerticalScale2.setRange(0.1, 1)
+        self.controlButtonHorizontalScale.setScale(0.1, 0.5, 0.1)
+        self.controlButtonHorizontalScale.setRange(0.1, 0.5)
         
         # signal size and rate controls
         self.controlButtonSize = Qwt.QwtKnob()
@@ -475,7 +451,7 @@ class MainFrame(QMainWindow):
         self.channelButton.insertItem(1,"Channel 1")
         self.channelButton.insertItem(2,"Channel 2")        
         
-        self.razButton = QtGui.QPushButton("RAZ", self)
+        self.razButton = QtGui.QPushButton("Delete recorded signal", self)
         
         self.StartRecording = QtGui.QPushButton("Start",self)
         self.StartNsec = QtGui.QPushButton("",self)
@@ -492,7 +468,7 @@ class MainFrame(QMainWindow):
         self.checkboxCut = QtGui.QCheckBox("",self)
 
         self.InputBoxNSecond = QtGui.QLineEdit(self)
-        self.InputBoxAntiNoise = QtGui.QLineEdit(self)
+        #self.InputBoxAntiNoise = QtGui.QLineEdit(self)
         self.InputBoxFrequency1 = QtGui.QLineEdit(self)
         self.InputBoxFrequency2 = QtGui.QLineEdit(self)
         self.InputBoxThreshold = QtGui.QLineEdit(self)
@@ -534,7 +510,7 @@ class MainFrame(QMainWindow):
         self.controlPanelLeftLayout.addWidget(self.checkboxIntegrate, 8, 1)
         self.controlPanelLeftLayout.addWidget(self.checkboxAntiNoise, 9, 0)
         self.controlPanelLeftLayout.addWidget(self.sliderAntiNoise, 9, 1)
-        self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 9, 2)
+        #self.controlPanelLeftLayout.addWidget(self.InputBoxAntiNoise, 9, 2)
         self.controlPanelLeftLayout.addWidget(self.checkboxLP, 10, 0)
         self.controlPanelLeftLayout.addWidget(self.checkboxHP, 10, 1)
         self.controlPanelLeftLayout.addWidget(self.checkboxBP, 11, 0)
@@ -565,7 +541,7 @@ class MainFrame(QMainWindow):
         self.checkboxIntegrate.setToolTip('Integrate the signal')
 
         self.checkboxAntiNoise.setToolTip('Activate the AntiNoise filter')
-        self.InputBoxAntiNoise.setToolTip('Set a percentage for the AntiNoise Filter')
+        #self.InputBoxAntiNoise.setToolTip('Set a percentage for the AntiNoise Filter')
         self.checkboxLP.setToolTip('Activate the Low Pass filter')
         self.checkboxHP.setToolTip('Activate the High Pass filter')
         self.checkboxBP.setToolTip('Activate the Band Pass filter')
@@ -704,14 +680,49 @@ class MainFrame(QMainWindow):
             dataToDisplay = self.signalFrame.getCurrentSignal().getLastSignalRecordedPart()
             recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getWellFormattedTimeSignal()[0]
             
-        # display it by refresh plot values to display
-        self.signalFrame.timeScope.update(dataToDisplay, rate)
-        self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
+        # display it by refresh plot values to display, depending on the
+        # channel number
+        if self.selectedChannel == 3 :
+            
+            self.signalFrame.timeScope.update(dataToDisplay, rate)
+            self.signalFrame.freqScope.update(Signal.getFreqSignalFromTimeSignal(dataToDisplay), rate)
+        
+        elif self.selectedChannel == 1 :
+            
+            print "channel 1"
+            
+            toDisplayTime = [dataToDisplay[0],[0.0,0.0]]
+            toDisplayFreq = [Signal.getFreqSignalFromTimeSignal(dataToDisplay)[0],[0.0,0.0]]
+            
+            self.signalFrame.timeScope.update(toDisplayTime, rate)
+            self.signalFrame.freqScope.update(toDisplayFreq, rate)
+            
+        else :
+            
+            print "channel 2"
+            
+            # channel selected = 2
+            toDisplayTime = [[0.0,0.0], dataToDisplay[1]]
+            toDisplayFreq = [[0.0,0.0],Signal.getFreqSignalFromTimeSignal(dataToDisplay)[1]]
+            
+            self.signalFrame.timeScope.update(toDisplayTime, rate)
+            self.signalFrame.freqScope.update(toDisplayFreq, rate)
             
         # update recorded signal diplay
         # if recording, real time recorded signal display
         #if self.isRecording :      
         self.recordedSignal.plot(recordedSignalToDisplay, clear=True) 
+        
+        
+        # update signal information
+        recordingTime   = self.signalFrame.getCurrentSignal().getRecordingTime()
+        amplitudeMax    = self.signalFrame.getCurrentSignal().getAmplitudeMax()
+        peakToPeak      = self.signalFrame.getCurrentSignal().getPeakToPeak()
+        phaseShift      = self.signalFrame.getCurrentSignal().getPhaseShift()
+        self.informationLabel1.setText(u"Amplitude max : "+str(amplitudeMax)+" [V]")
+        self.informationLabel2.setText(u"Peak to peak Value: "+str(peakToPeak)+" [V]")
+        self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
+        self.informationLabel4.setText(u"Phase shift : "+str(phaseShift)+" [rad]")
 
              
     #
@@ -738,7 +749,9 @@ class MainFrame(QMainWindow):
         self.connect(self.StopRecording, QtCore.SIGNAL('clicked()'), self.stopRecording)
         self.connect(self.Trigger, QtCore.SIGNAL('clicked()'), self.launchTrigger)
         self.connect(self.StartNsec, QtCore.SIGNAL('clicked()'), self.startRecordNsec)
-        self.connect(self.razButton, QtCore.SIGNAL('clicked()'), self.deleteCurrentSignal)     
+        self.connect(self.razButton, QtCore.SIGNAL('clicked()'), self.deleteCurrentSignal) 
+        self.channelButton.currentIndexChanged['QString'].connect(self.setChannel)
+            
         
         # control for recorded signal
         #self.connect(self.sliderAntiNoise, QtCore.SIGNAL('valueChanged(int)'), self.applyAntiNoiseRecordedSignal)
@@ -753,31 +766,7 @@ class MainFrame(QMainWindow):
     #
     # ------------------------------------------------------------------
     #
-    def setSize(self, newSize):
-        print "[newSize] "+str(newSize)
-        
-        # destroy the current signal
-        self.__deleteCurrentSignal()
-        
-        # replace the current by a new signal using the new size
-        rate    = self.signalFrame.getCurrentSignal().rate
-        channel = self.signalFrame.getCurrentSignal().channel
-        format  = self.signalFrame.getCurrentSignal().format
-        self.signalFrame.setCurrentSignal(Signal(rate, int(newSize), format, channel))
-        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
     
-    def setRate(self, newRate):
-        print "[newRate] "+str(newRate)
-        
-        # stop the current signal acquisition
-        self.__deleteCurrentSignal()
-        
-        # replace the current by a new signal using the new size
-        size    = self.signalFrame.getCurrentSignal().size
-        channel = self.signalFrame.getCurrentSignal().channel
-        format  = self.signalFrame.getCurrentSignal().format
-        self.signalFrame.setCurrentSignal(Signal(int(newRate), size, format, channel))
-        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
     
     def setVerticalScale(self, newVerticalScale):
         print "[Vertical Scale] "+str(newVerticalScale)
@@ -793,21 +782,16 @@ class MainFrame(QMainWindow):
         self.signalFrame.deleteAllSignal()
         self.close()
     
-    def setAntiNoise(self):
-        print "[Anti noise] "+str(self.sliderAntiNoise.value())
-        #self.signalFrame.getFreqScope().setVerticalScale(newVerticalScale)
-    
-    #
-    # ==================================================================
-    #
-    # SIGNAL MANAGEMENT
-    # Link with all the AMVU classes
-    #
-    # ==================================================================
-    #
-    def deleteCurrentSignal(self):
-        self.signalFrame.deleteCurrentSignal()
+    def setChannel(self, newChannel) :
         
+        # read the channel number from the combobox
+        if newChannel == "Channel 1" :
+            self.selectedChannel = 1
+        elif newChannel == "Channel 2": 
+            self.selectedChannel = 2
+        else :
+            self.selectedChannel = 3
+            
     def applyAntiNoiseRecordedSignal(self):
         
         print "[Anti noise] "+str(self.sliderAntiNoise.value())
@@ -819,6 +803,64 @@ class MainFrame(QMainWindow):
             noisePercent  = self.sliderAntiNoise.value()/100
             recordedSignalToDisplay = self.signalFrame.getCurrentSignal().getAntiNoiseSignal(noisePercent)[0]
             self.recordedSignal.plot(recordedSignalToDisplay, clear=True)
+            
+    #def setAntiNoise(self):
+    #    print "[Anti noise] "+str(self.sliderAntiNoise.value())
+    #    #self.signalFrame.getFreqScope().setVerticalScale(newVerticalScale)
+    
+    #
+    # ==================================================================
+    #
+    # SIGNAL MANAGEMENT
+    # Link with all the AMVU classes
+    #
+    # ==================================================================
+    #
+    def setSize(self, newSize):
+        print "[newSize] "+str(newSize)
+        
+        # destroy the current signal
+        self.deleteCurrentSignal()
+        
+        # replace the current by a new signal using the new size
+        rate    = self.signalFrame.getCurrentSignal().rate
+        #channel = self.signalFrame.getCurrentSignal().channel
+        channel = 2
+        format  = self.signalFrame.getCurrentSignal().format
+        self.signalFrame.setCurrentSignal(Signal(rate, int(newSize), format, channel))
+        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
+    
+    def setRate(self, newRate):
+        print "[newRate] "+str(newRate)
+        
+        # stop the current signal acquisition
+        self.deleteCurrentSignal()
+        
+        # replace the current by a new signal using the new rate
+        size    = self.signalFrame.getCurrentSignal().size
+        #channel = self.signalFrame.getCurrentSignal().channel
+        channel = 2
+        format  = self.signalFrame.getCurrentSignal().format
+        self.signalFrame.setCurrentSignal(Signal(int(newRate), size, format, channel))
+        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
+        
+        
+    def deleteCurrentSignal(self):
+        
+        # delete current recorded signal
+        self.signalFrame.deleteCurrentSignal()
+        self.recordedSignal.clear()
+        
+        # set a new signal to prepare future recording and allow
+        # real time display
+        size    = self.signalFrame.getCurrentSignal().size
+        rate    = self.signalFrame.getCurrentSignal().rate
+        channel = self.signalFrame.getCurrentSignal().channel
+        format  = self.signalFrame.getCurrentSignal().format
+        self.signalFrame.setCurrentSignal(Signal(rate, size, format, channel))
+        self.signalFrame.getCurrentSignal().startRealTimeDisplay()
+        
+
        
     def startRecordNsec(self):
         

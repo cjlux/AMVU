@@ -45,12 +45,9 @@ class Plot(Qwt.QwtPlot):
         self.dataToDisplay = dataToDisplay
         
         # currently wrote for 2 channels
-        a1 = dataToDisplay[0]
-        a2 = dataToDisplay[1]
+        #a1 = dataToDisplay[0]
+        #a2 = dataToDisplay[1]
         dt = 1./rate
-        #self.__initPlot(a1, a2, dt)
-
-        #def __initPlot(self, a1, a2, dt, *args) :
         
         # signal characteristics
         self.dt     = dt
@@ -104,8 +101,8 @@ class Plot(Qwt.QwtPlot):
         
         # curve display initialisation
         #l = len(self.a1)
-        self.curve1.setData(self.ti, self.a1)
-        self.curve2.setData(self.ti, self.a2)
+        #self.curve1.setData(self.ti, self.a1)
+        #self.curve2.setData(self.ti, self.a2)
         
         # plot scope traces
         
@@ -114,9 +111,10 @@ class Plot(Qwt.QwtPlot):
         self.a2 = dataToDisplay[1]
         
         # display
-        l=len(self.a1)
-        self.curve1.setData([0.0,0.0], [0.0,0.0])
-        self.curve2.setData(self.ti[0:l], self.a2[:l])
+        l1 = len(self.a1)
+        l2 = len(self.a2)
+        self.curve1.setData(self.ti[0:l1], self.a1[:l1])
+        self.curve2.setData(self.ti[0:l2], self.a2[:l2])
         
         self.replot()
         
@@ -126,6 +124,9 @@ class Plot(Qwt.QwtPlot):
         self.offset = newOffset
         
     def update(self, dataToDisplay, rate):
+        
+        #print "data to display [0] : "+str(dataToDisplay[0])
+        #print "data to display [1] : "+str(dataToDisplay[1])
         
         # get the new values of the plotted signal
         # currently wrote for 2 channels
@@ -138,10 +139,22 @@ class Plot(Qwt.QwtPlot):
         #print dataToDisplay
         #print self.a1
         #print self.a2
+        l1 = len(self.a1)
+        l2 = len(self.a2)
         
-        l=len(self.a1)
-        self.curve1.setData([0.0,0.0], [0.0,0.0])
-        self.curve2.setData(self.ti[0:l], self.a2[:l])
+        if l1 == 2 :
+            # display only channel 2
+            self.curve1.setData([0.0,0.0], [0.0,0.0])
+            self.curve2.setData(self.ti[0:l2], self.a2[:l2])
+        elif l2 == 2 :
+            # display only channel 1
+            self.curve1.setData(self.ti[0:l1], self.a1[:l1])
+            self.curve2.setData([0.0,0.0], [0.0,0.0])
+        else :
+            # display channel 1 and 2
+            self.curve1.setData(self.ti[0:l1], self.a1[:l1])
+            self.curve2.setData(self.ti[0:l2], self.a2[:l2])
+
         self.replot()
         
         #print "[Oh yeah, I update]"
