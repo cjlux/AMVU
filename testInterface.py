@@ -732,7 +732,15 @@ class MainFrame(QMainWindow):
         if self.InputBoxChannel2Units.text() == '' : self.units2 = 'V'
         if self.channelButton.currentIndex() == 1 : self.units = self.units1
         if self.channelButton.currentIndex() == 2 : self.units = self.units2
-        if self.channelButton.currentIndex() == 0 and self.InputBoxChannel1Units.text() <> '' and self.InputBoxChannel2Units.text() <> '' :print(u"When the channels 1 and 2 are both selected, the default sensor unit is [V]")
+        if self.channelButton.currentIndex() == 0:
+            if self.InputBoxChannel1Units.text() <> '':
+                if self.InputBoxChannel2Units.text() <> '' :
+                    print(u"When the channels 1 and 2 are both selected, the default sensor unit is [V]")
+                if self.InputBoxChannel1Units.text() == self.InputBoxChannel2Units.text():
+                    self.units = self.InputBoxChannel1Units.text()
+            if self.InputBoxChannel1Units.text() == '' or self.InputBoxChannel2Units.text() == '':
+                self.units = 'V'
+       
         
         # update signal information
         recordingTime   = self.signalFrame.getCurrentSignal().getRecordingTime()
