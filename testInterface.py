@@ -231,7 +231,7 @@ class MainFrame(QMainWindow):
         self.signalGraph.addTab(self.recordedSignalTab,"Recorded signal")
         
         # add the graph tab to the global interface
-        self.globalInterfaceLeftLayout.addWidget(self.signalGraph, 1, 0)
+        self.globalInterfaceLeftLayout.addWidget(self.signalGraph, 2, 0)
 
     def setToolBar(self):
 
@@ -340,16 +340,12 @@ class MainFrame(QMainWindow):
     def setSignalInformation(self):
         
         # create a label to display information
-        self.informationLabel1 = QtGui.QLabel(u"Amplitude max : [V]")
-        self.informationLabel2 = QtGui.QLabel(u"Peak to peak Value: [V]")
-        self.informationLabel3 = QtGui.QLabel(u"Recording time : [sec]")
-        self.informationLabel4 = QtGui.QLabel(u"Phase shift : [rad]")
-
-        '''Do not forget to make the QLineEdit for each informationLabel'''
-
-        self.infoAction = QtGui.QLineEdit("Current action : ",self)
-        self.infoAction.setReadOnly(True)
-        self.infoAction.setText("None")
+        self.informationLabel1 = QtGui.QLabel()#u"Amplitude max : [V]")
+        self.informationLabel2 = QtGui.QLabel()#u"Peak to peak Value: [V]")
+        self.informationLabel3 = QtGui.QLabel()#u"Recording time : [sec]")
+        self.informationLabel4 = QtGui.QLabel()#u"Phase shift : [rad]")
+        self.informationLabel11 = QtGui.QLabel()
+        self.informationLabel22 = QtGui.QLabel()      
         
         
         # add this label to the global interface
@@ -357,10 +353,23 @@ class MainFrame(QMainWindow):
         self.signalInformationLayout.addWidget(self.informationLabel1, 0, 0)
         self.signalInformationLayout.addWidget(self.informationLabel2, 1, 0)
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
-        self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
+        self.signalInformationLayout.addWidget(self.informationLabel4, 2, 1)
+        self.signalInformationLayout.addWidget(self.informationLabel11, 0, 1)
+        self.signalInformationLayout.addWidget(self.informationLabel22, 1, 1)
+        
 
-        #set the infoAction box on the signalInformationLayout
-        self.signalInformationLayout.addWidget(self.infoAction, 3, 3)
+        #create the infoAction box
+        self.infoAction = QtGui.QLineEdit("Current action : ",self)
+        self.infoAction.setReadOnly(True)
+        self.infoAction.setText("None")
+
+        #add this label to the running info interface
+        self.runningInfoLayout = QtGui.QGridLayout()
+        self.runningInfoLayout.addWidget(self.infoAction, 0, 0)
+        
+        self.runningInfo = QWidget()
+        self.runningInfo.setLayout(self.runningInfoLayout)
+        self.globalInterfaceLeftLayout.addWidget(self.runningInfo, 1, 0)
 
                 
         self.signalInformation = QWidget()
@@ -603,8 +612,7 @@ class MainFrame(QMainWindow):
 
         #make the groups exclusive
         self.GroupRecording.setExclusive(True)
-        self.GroupMath.setExclusive(True)
-        self.GroupFilter.setExclusive(True)
+        
         
         # connect GUI
         self.connectGUI()
@@ -732,25 +740,37 @@ class MainFrame(QMainWindow):
         if self.InputBoxChannel2Units.text() == '' : self.units2 = 'V'
         if self.channelButton.currentIndex() == 1 : self.units = self.units1
         if self.channelButton.currentIndex() == 2 : self.units = self.units2
-        if self.channelButton.currentIndex() == 0:
-            if self.InputBoxChannel1Units.text() <> '':
-                if self.InputBoxChannel2Units.text() <> '' :
-                    print(u"When the channels 1 and 2 are both selected, the default sensor unit is [V]")
-                if self.InputBoxChannel1Units.text() == self.InputBoxChannel2Units.text():
-                    self.units = self.InputBoxChannel1Units.text()
-            if self.InputBoxChannel1Units.text() == '' or self.InputBoxChannel2Units.text() == '':
-                self.units = 'V'
-       
+                
         
         # update signal information
         recordingTime   = self.signalFrame.getCurrentSignal().getRecordingTime()
         amplitudeMax    = self.signalFrame.getCurrentSignal().getAmplitudeMax()
         peakToPeak      = self.signalFrame.getCurrentSignal().getPeakToPeak()
         phaseShift      = self.signalFrame.getCurrentSignal().getPhaseShift()
-        self.informationLabel1.setText(u"Amplitude max : "+str(amplitudeMax)+" ["+str(self.units)+"]")
-        self.informationLabel2.setText(u"Peak to peak Value: "+str(peakToPeak)+" ["+str(self.units)+"]")
-        self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
-        self.informationLabel4.setText(u"Phase shift : "+str(phaseShift)+" [rad]")
+
+        #hide or show the different stuff from the infobox
+        if self.channelButton.currentIndex() == 0:
+            self.informationLabel1.setText(u"Amplitude max Channel 1 : "+str(amplitudeMax)+" ["+str(self.units1)+"]")
+            self.informationLabel11.setText(u"Amplitude max Channel 2 : "+str(amplitudeMax)+" ["+str(self.units2)+"]")
+            self.informationLabel2.setText(u"Peak to peak Value Channel 1: "+str(peakToPeak)+" ["+str(self.units1)+"]")
+            self.informationLabel22.setText(u"Peak to peak Value Channel 2: "+str(peakToPeak)+" ["+str(self.units2)+"]")
+            self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
+            self.informationLabel4.show()
+            self.informationLabel4.setText(u"Phase shift : "+str(phaseShift)+" [rad]")
+        if self.channelButton.currentIndex() == 1:
+            self.informationLabel1.setText(u"Amplitude max Channel 1 : "+str(amplitudeMax)+" ["+str(self.units1)+"]")
+            self.informationLabel11.setText('')
+            self.informationLabel2.setText(u"Peak to peak Value Channel 1: "+str(peakToPeak)+" ["+str(self.units1)+"]")
+            self.informationLabel22.setText('')
+            self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
+            self.informationLabel4.hide()
+        if self.channelButton.currentIndex() == 2:
+            self.informationLabel1.setText(u"Amplitude max Channel 2 : "+str(amplitudeMax)+" ["+str(self.units2)+"]")
+            self.informationLabel11.setText('')
+            self.informationLabel2.setText(u"Peak to peak Value Channel 2: "+str(peakToPeak)+" ["+str(self.units2)+"]")
+            self.informationLabel22.setText('')
+            self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
+            self.informationLabel4.hide()
 
         
 
