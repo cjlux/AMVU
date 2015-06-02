@@ -32,6 +32,7 @@ import numpy as np
 
 import sys
 
+from PyQt4 import QtGui
 from PyQt4 import Qt
 from PyQt4 import QtCore
 from PyQt4 import Qwt5 as Qwt
@@ -116,9 +117,30 @@ class Plot(Qwt.QwtPlot):
         self.curve1.setData(self.ti[0:l1], self.a1[:l1])
         self.curve2.setData(self.ti[0:l2], self.a2[:l2])
         
+        # set cursor
+        self.setMouseTracking(True)
+        
+        self.picker1 = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom, Qwt.QwtPlot.yLeft, Qwt.QwtPicker.PointSelection | Qwt.QwtPicker.DragSelection, Qwt.QwtPlotPicker.CrossRubberBand, Qwt.QwtPicker.ActiveOnly, self.canvas())
+        self.picker1.setTrackerMode(Qwt.QwtPicker.AlwaysOn)
+        
+        self.marker = Qwt.QwtPlotMarker()
+        self.marker.setLineStyle(Qwt.QwtPlotMarker.VLine | Qwt.QwtPlotMarker.HLine)
+        self.marker.setLabelAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignBottom)
+        self.marker.setLinePen(QtGui.QPen(QtCore.Qt.darkGray, 1, QtCore.Qt.DashLine))
+        self.marker.setValue(1.0, 0.0)
+        self.marker.attach(self)
+        
+        
+        
         self.replot()
         
-    
+    def mouseMoveEvent(self, e) :
+        canvasPos = self.canvas().mapFrom(self, e.pos())
+        x = self.invTransform(Qwt.QwtPlot.xBottom, canvasPos.x())
+        y = self.invTransform(Qwt.QwtPlot.yLeft, canvasPos.y())
+        self.marker.setValue(x, y)
+        self.replot()
+        
         
     def setOffset(self, newOffset):
         self.offset = newOffset
