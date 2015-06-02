@@ -612,7 +612,8 @@ class MainFrame(QMainWindow):
 
         #make the groups exclusive
         self.GroupRecording.setExclusive(True)
-        
+        self.GroupMath.setExclusive(False)
+        self.GroupFilter.setExclusive(False)
         
         # connect GUI
         self.connectGUI()
@@ -897,16 +898,18 @@ class MainFrame(QMainWindow):
         
     def deleteCurrentSignal(self):
         
-        # delete current recorded signal
-        self.signalFrame.deleteCurrentSignal()
-        self.recordedSignal.clear()
-        
         # set a new signal to prepare future recording and allow
         # real time display
         size    = self.signalFrame.getCurrentSignal().size
         rate    = self.signalFrame.getCurrentSignal().rate
         channel = self.signalFrame.getCurrentSignal().channel
         format  = self.signalFrame.getCurrentSignal().format
+        
+        # delete current recorded signal
+        self.signalFrame.deleteCurrentSignal()
+        self.recordedSignal.clear()
+        
+        # set new signal
         self.signalFrame.setCurrentSignal(Signal(rate, size, format, channel))
         self.signalFrame.getCurrentSignal().startRealTimeDisplay()
         

@@ -216,10 +216,12 @@ class Signal():
         self.threadsDieNow = True
         
         try :
+            t.sleep(0,01)
             self.stopSignalStream()
+            t.sleep(0,01)
             self.soundCardLink.terminate()
-        except e :
-            print "Memory explosion due to huge level of reccursion"
+        except Exception :
+            print "Baoum, explosion due to huge level of reccursion"
         #self.closeSignalStream()
     
     #
@@ -399,7 +401,7 @@ class Signal():
         """
         
         # filtering signalParts
-        timeSignalTmp = self.self.getTimeSignal()
+        timeSignalTmp = self.getTimeSignal()
         freqSignalTmp = Signal.getTimeSignalFromFreqSignal(timeSignalTmp)
 
         for k in range(len(freqSignalTmp)):
