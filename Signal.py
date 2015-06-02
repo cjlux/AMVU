@@ -649,7 +649,7 @@ class Signal():
         """
         Amax = 0
 
-        freqSignalTmp = Signal.getFreqSignalFromTimeSignal(self.getTimeSignal())
+        freqSignalTmp = Signal.getFreqSignalFromTimeSignal(self.signalPart)
         
         for k in range(len(freqSignalTmp)) :
             if freqSignalTmp[k] > Amax :
@@ -691,7 +691,7 @@ class Signal():
             self.stopRecordingTime = t.time()
             tmpRecordingTime     = (self.stopRecordingTime - self.startRecordingTime)
         
-        return int(self.recordingTime + tmpRecordingTime)
+        return self.recordingTime + tmpRecordingTime
         
     def getPhaseShift(self) :
         return 0

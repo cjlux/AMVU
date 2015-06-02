@@ -160,6 +160,10 @@ class MainFrame(QMainWindow):
         self.InputBoxAntiNoise 	= None
         self.InputBoxChanel1Sensibility = None
         self.InputBoxChanel2Sensibility = None
+
+        self.units = 'V'
+        self.units1 = None
+        self.units2 = None
                
 #=======
         
@@ -344,7 +348,7 @@ class MainFrame(QMainWindow):
         '''Do not forget to make the QLineEdit for each informationLabel'''
 
         self.infoAction = QtGui.QLineEdit("Current action : ",self)
-        self.infoAction.isReadOnly()
+        self.infoAction.setReadOnly(True)
         self.infoAction.setText("None")
         
         
@@ -590,9 +594,17 @@ class MainFrame(QMainWindow):
         #add the checkboxs to the group
         self.GroupRecording.addButton(self.StartRecording)
         self.GroupRecording.addButton(self.StopRecording)
+        self.GroupMath.addButton(self.checkboxDerivate)
+        self.GroupMath.addButton(self.checkboxIntegrate)
+        self.GroupFilter.addButton(self.checkboxLP)
+        self.GroupFilter.addButton(self.checkboxHP)
+        self.GroupFilter.addButton(self.checkboxBP)
+        self.GroupFilter.addButton(self.checkboxCut)
 
         #make the groups exclusive
         self.GroupRecording.setExclusive(True)
+        self.GroupMath.setExclusive(True)
+        self.GroupFilter.setExclusive(True)
         
         # connect GUI
         self.connectGUI()
@@ -712,17 +724,25 @@ class MainFrame(QMainWindow):
         # if recording, real time recorded signal display
         #if self.isRecording :      
         self.recordedSignal.plot(recordedSignalToDisplay, clear=True) 
-        
+
+        #change the units in the display
+        if self.InputBoxChannel1Units.isModified() : self.units1 = self.InputBoxChannel1Units.text()
+        if self.InputBoxChannel1Units.text() == '' : self.units1 = 'V'
+        if self.InputBoxChannel2Units.isModified() : self.units2 = self.InputBoxChannel2Units.text()
+        if self.InputBoxChannel2Units.text() == '' : self.units2 = 'V'
+        #if self.channelButton.currentIndex() == 1 :self.units = self.units1
         
         # update signal information
         recordingTime   = self.signalFrame.getCurrentSignal().getRecordingTime()
         amplitudeMax    = self.signalFrame.getCurrentSignal().getAmplitudeMax()
         peakToPeak      = self.signalFrame.getCurrentSignal().getPeakToPeak()
         phaseShift      = self.signalFrame.getCurrentSignal().getPhaseShift()
-        self.informationLabel1.setText(u"Amplitude max : "+str(amplitudeMax)+" [V]")
-        self.informationLabel2.setText(u"Peak to peak Value: "+str(peakToPeak)+" [V]")
+        self.informationLabel1.setText(u"Amplitude max : "+str(amplitudeMax)+" ["+str(self.units1)+"]")
+        self.informationLabel2.setText(u"Peak to peak Value: "+str(peakToPeak)+" ["+str(self.units)+"]")
         self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
         self.informationLabel4.setText(u"Phase shift : "+str(phaseShift)+" [rad]")
+
+        
 
              
     #
