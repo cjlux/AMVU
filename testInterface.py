@@ -334,10 +334,28 @@ class MainFrame(QMainWindow):
     def setSignalInformation(self):
         
         # create a label to display information
-        self.informationLabel1 = QtGui.QLabel(u"Amplitude : [V]")
-        self.informationLabel2 = QtGui.QLabel(u"Peak to peak Value: [V]")
-        self.informationLabel3 = QtGui.QLabel(u"Recording time : [sec]")
-        self.informationLabel4 = QtGui.QLabel(u"Phase shift : [rad]")
+        self.informationLabel1 = QtGui.QLabel(u"Amplitude :")
+        self.informationLabel10 = QtGui.QLabel("[V]")        
+        self.informationLabel2 = QtGui.QLabel(u"Peak to peak Value:")
+        self.informationLabel20 = QtGui.QLabel("[V]")
+        self.informationLabel3 = QtGui.QLabel(u"Recording time :")
+        self.informationLabel30 = QtGui.QLabel("[sec]")
+        self.informationLabel4 = QtGui.QLabel(u"Phase shift :")
+        self.informationLabel40 = QtGui.QLabel("[rad]")
+
+        self.infoLabel1 = QtGui.QLineEdit(self)
+        self.infoLabel1.isReadOnly()
+        self.infoLabel1.setText("None")
+        self.infoLabel2 = QtGui.QLineEdit(self)
+        self.infoLabel2.isReadOnly()
+        self.infoLabel2.setText("None")
+        self.infoLabel3 = QtGui.QLineEdit(self)
+        self.infoLabel3.isReadOnly()
+        self.infoLabel3.setText("None")
+        self.infoLabel4 = QtGui.QLineEdit(self)
+        self.infoLabel4.isReadOnly()
+        self.infoLabel4.setText("None")
+        
 
         '''Do not forget to make the QLineEdit for each informationLabel'''
 
@@ -349,9 +367,17 @@ class MainFrame(QMainWindow):
         # add this label to the global interface
         self.signalInformationLayout = QtGui.QGridLayout()
         self.signalInformationLayout.addWidget(self.informationLabel1, 0, 0)
+        self.signalInformationLayout.addWidget(self.infoLabel1, 0, 1)
+        self.signalInformationLayout.addWidget(self.informationLabel10, 0, 2)        
         self.signalInformationLayout.addWidget(self.informationLabel2, 1, 0)
+        self.signalInformationLayout.addWidget(self.infoLabel2, 1, 1)
+        self.signalInformationLayout.addWidget(self.informationLabel20, 1, 2)
         self.signalInformationLayout.addWidget(self.informationLabel3, 2, 0)
+        self.signalInformationLayout.addWidget(self.infoLabel3, 2, 1)
+        self.signalInformationLayout.addWidget(self.informationLabel30, 2, 2)
         self.signalInformationLayout.addWidget(self.informationLabel4, 3, 0)
+        self.signalInformationLayout.addWidget(self.infoLabel4, 3, 1)
+        self.signalInformationLayout.addWidget(self.informationLabel40, 3, 2)
 
         #set the infoAction box on the signalInformationLayout
         self.signalInformationLayout.addWidget(self.infoAction, 3, 3)
