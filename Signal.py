@@ -655,7 +655,7 @@ class Signal():
             if freqSignalTmp[k] > Amax :
                 Amax = freqSignalTmp[k]             
         
-        return Amax
+        return round(Amax , 3)
         
     def getPeakToPeak(self) :
         """ 
@@ -676,7 +676,7 @@ class Signal():
             if signalPart[k] < Amin :
                 Amin = signalPart[k] 
         
-        return Amax - Amin
+        return round(Amax - Amin , 3)
         
     def getRecordingTime(self) :
         """ 
@@ -691,7 +691,7 @@ class Signal():
             self.stopRecordingTime = t.time()
             tmpRecordingTime     = (self.stopRecordingTime - self.startRecordingTime)
         
-        return self.recordingTime + tmpRecordingTime
+        return round(self.recordingTime + tmpRecordingTime, 2)
         
     def getPhaseShift(self) :
         return 0

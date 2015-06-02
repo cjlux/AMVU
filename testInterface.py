@@ -725,19 +725,21 @@ class MainFrame(QMainWindow):
         #if self.isRecording :      
         self.recordedSignal.plot(recordedSignalToDisplay, clear=True) 
 
-        #change the units in the display
+        #change the units in the display box
         if self.InputBoxChannel1Units.isModified() : self.units1 = self.InputBoxChannel1Units.text()
         if self.InputBoxChannel1Units.text() == '' : self.units1 = 'V'
         if self.InputBoxChannel2Units.isModified() : self.units2 = self.InputBoxChannel2Units.text()
         if self.InputBoxChannel2Units.text() == '' : self.units2 = 'V'
-        #if self.channelButton.currentIndex() == 1 :self.units = self.units1
+        if self.channelButton.currentIndex() == 1 : self.units = self.units1
+        if self.channelButton.currentIndex() == 2 : self.units = self.units2
+        if self.channelButton.currentIndex() == 0 and self.InputBoxChannel1Units.text() <> '' and self.InputBoxChannel2Units.text() <> '' :print(u"When the channels 1 and 2 are both selected, the default sensor unit is [V]")
         
         # update signal information
         recordingTime   = self.signalFrame.getCurrentSignal().getRecordingTime()
         amplitudeMax    = self.signalFrame.getCurrentSignal().getAmplitudeMax()
         peakToPeak      = self.signalFrame.getCurrentSignal().getPeakToPeak()
         phaseShift      = self.signalFrame.getCurrentSignal().getPhaseShift()
-        self.informationLabel1.setText(u"Amplitude max : "+str(amplitudeMax)+" ["+str(self.units1)+"]")
+        self.informationLabel1.setText(u"Amplitude max : "+str(amplitudeMax)+" ["+str(self.units)+"]")
         self.informationLabel2.setText(u"Peak to peak Value: "+str(peakToPeak)+" ["+str(self.units)+"]")
         self.informationLabel3.setText(u"Recording time : "+str(recordingTime)+" [sec]")
         self.informationLabel4.setText(u"Phase shift : "+str(phaseShift)+" [rad]")
